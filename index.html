@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GD Tierlist — Главная</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: system-ui, Arial, sans-serif;
+    max-width: 1100px;
+    margin: 20px auto;
+    padding: 0 16px;
+    background: #111;
+    color: #eee;
+  }
+  h1 { font-size: 26px; margin-bottom: 0; }
+  .sub { font-size:14px; color:#888; margin-top:-4px; }
+
+  #admin-bar {
+    position: sticky;
+    top: 0;
+    background: #0a0a0a;
+    padding: 8px 12px;
+    border-bottom: 1px solid #333;
+    margin-bottom: 16px;
+    font-size: 13px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    z-index: 10;
+  }
+  #admin-bar input {
+    width: auto;
+    padding: 4px 8px;
+    background: #222;
+    border: 1px solid #444;
+    color: #eee;
+    border-radius: 4px;
+  }
+  #admin-bar button {
+    padding: 4px 12px;
+    border-radius: 4px;
+    border: 1px solid #444;
+    background: #222;
+    color: #eee;
+    cursor: pointer;
+  }
+  #admin-bar .google-btn {
+    background: #4285F4;
+    border-color: #4285F4;
+    color: #fff;
+  }
+
+  .tabs {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin: 12px 0 16px;
+  }
+  .tabs button {
+    padding: 8px 18px;
+    cursor: pointer;
+    background: #222;
+    color: #eee;
+    border: 1px solid #444;
+    border-radius: 6px;
+    font-size: 14px;
+  }
+  .tabs button.active {
+    background: #3a6;
+    border-color: #3a6;
+    color: #000;
+    font-weight: bold;
+  }
+
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  .hero {
+    text-align: center;
+    padding: 20px 0 30px;
+  }
+  .hero h1 { font-size: 32px; }
+  .hero p { font-size: 18px; color: #aaa; max-width: 600px; margin: 0 auto; }
+  .stats {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    margin: 30px 0;
+    flex-wrap: wrap;
+  }
+  .stat-item {
+    background: #1a1a1a;
+    padding: 16px 24px;
+    border-radius: 12px;
+    border: 1px solid #333;
+    min-width: 140px;
+    text-align: center;
+  }
+  .stat-item .number {
+    font-size: 36px;
+    font-weight: bold;
+    color: #3a6;
+    display: block;
+  }
+  .stat-item .label {
+    font-size: 14px;
+    color: #888;
+  }
+  .hero-actions {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 10px;
+  }
+  .hero-actions .btn {
+    display: inline-block;
+    padding: 10px 28px;
+    background: #2a2a2a;
+    border: 1px solid #555;
+    border-radius: 30px;
+    color: #eee;
+    text-decoration: none;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+  .hero-actions .btn:hover {
+    background: #3a6;
+    border-color: #3a6;
+    color: #000;
+  }
+  .hero-actions .btn-primary {
+    background: #3a6;
+    border-color: #3a6;
+    color: #000;
+    font-weight: bold;
+  }
+  .hero-actions .btn-primary:hover {
+    background: #4c8;
+  }
+  .social-links {
+    margin-top: 30px;
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    font-size: 16px;
+  }
+  .social-links a {
+    color: #6af;
+    text-decoration: none;
+  }
+  .social-links a:hover { text-decoration: underline; }
+
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 12px;
+    margin-top: 12px;
+  }
+  .card {
+    background: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 12px;
+  }
+  .card .tier { font-weight: bold; font-size: 18px; color: #3a6; }
+  .card .name { font-size: 16px; font-weight: bold; }
+  .card .detail { font-size: 12px; color: #aaa; margin-top: 4px; word-wrap: break-word; }
+  .card .detail a { color: #6af; text-decoration: underline; }
+
+  .table-wrap { overflow-x: auto; margin-top: 12px; }
+  .table-wrap table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .table-wrap th, .table-wrap td { border: 1px solid #333; padding: 6px 8px; text-align: left; vertical-align: top; }
+  .table-wrap th { background: #1c1c1c; }
+  .table-wrap tr:nth-child(even) { background: #181818; }
+
+  .proposal-item {
+    background: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+  .proposal-item:hover { border-color: #555; }
+  .proposal-header {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  .proposal-header .title { font-weight: bold; font-size: 16px; }
+  .proposal-header .meta { font-size: 13px; color: #aaa; }
+  .proposal-fields {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px 16px;
+    font-size: 14px;
+    margin: 8px 0;
+    background: #111;
+    padding: 10px;
+    border-radius: 6px;
+  }
+  .proposal-fields .field { display: flex; flex-wrap: wrap; }
+  .proposal-fields .field .label { color: #888; min-width: 100px; }
+  .proposal-fields .field .value { color: #eee; word-break: break-word; }
+  .proposal-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+    padding-top: 8px;
+    border-top: 1px solid #2a2a2a;
+  }
+  .proposal-actions button {
+    padding: 4px 14px;
+    border-radius: 4px;
+    border: 1px solid #444;
+    background: #222;
+    color: #eee;
+    cursor: pointer;
+    font-size: 13px;
+  }
+  .proposal-actions button:hover { background: #333; }
+  .proposal-actions .delete-btn { border-color: #e55; color: #e55; }
+  .proposal-actions .delete-btn:hover { background: #e55; color: #000; }
+  .status-badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: bold;
+  }
+  .status-badge.pending { background: #e6c229; color: #000; }
+  .status-badge.approved { background: #3a6; color: #000; }
+  .status-badge.rejected { background: #e55; color: #fff; }
+
+  .comments { margin-top: 8px; }
+  .comment { font-size: 12px; border-top: 1px solid #2a2a2a; padding-top: 6px; margin-top: 6px; }
+
+  form {
+    background: #1a1a1a;
+    padding: 16px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+  }
+  form label { display: block; margin-top: 8px; font-size: 13px; color: #aaa; }
+  form input, form textarea, form select {
+    width: 100%;
+    padding: 6px;
+    margin-top: 3px;
+    background: #222;
+    color: #eee;
+    border: 1px solid #444;
+    border-radius: 4px;
+    box-sizing: border-box;
+  }
+  form button {
+    margin-top: 12px;
+    padding: 8px 20px;
+    background: #3a6;
+    color: #000;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  .small { font-size: 12px; color: #888; }
+  .flex { display: flex; gap: 12px; flex-wrap: wrap; }
+  .flex label { flex: 1; min-width: 140px; }
+
+  .view-toggle {
+    display: flex;
+    gap: 4px;
+    background: #1a1a1a;
+    border-radius: 6px;
+    padding: 4px;
+    border: 1px solid #333;
+  }
+  .view-toggle button {
+    background: transparent;
+    border: none;
+    color: #888;
+    padding: 4px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  .view-toggle button.active { background: #333; color: #fff; }
+
+  @media (max-width: 600px) {
+    .stats { gap: 16px; }
+    .stat-item { min-width: 100px; padding: 12px; }
+    .proposal-fields { grid-template-columns: 1fr; }
+    .hero h1 { font-size: 24px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Админ-панель -->
+<div id="admin-bar"></div>
+
+<!-- Заголовок и вкладки -->
+<div style="display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between;">
+  <div>
+    <h1>🎹 GD Tierlist</h1>
+    <p class="sub">Клавиатуры и свитчи — рейтинг сообщества</p>
+  </div>
+  <div class="view-toggle" id="view-toggle" style="margin:8px 0;">
+    <button id="view-grid" class="active" onclick="setView('grid')">🧱 Плитка</button>
+    <button id="view-list" onclick="setView('list')">📋 Список</button>
+  </div>
+</div>
+
+<!-- Вкладки -->
+<div class="tabs">
+  <button id="tab-btn-home" class="active" onclick="showTab('home')">🏠 Главная</button>
+  <button id="tab-btn-keyboards" onclick="showTab('keyboards')">⌨️ Клавиатуры</button>
+  <button id="tab-btn-switches" onclick="showTab('switches')">🔄 Свитчи</button>
+  <button id="tab-btn-proposals" onclick="showTab('proposals')">📋 Предложения</button>
+  <button id="tab-btn-new" onclick="showTab('new')">➕ Предложить</button>
+</div>
+
+<!-- ========== ВКЛАДКА: ГЛАВНАЯ ========== -->
+<div id="tab-home" class="tab-content active">
+  <div class="hero">
+    <h1>🏆 GD Tierlist</h1>
+    <p>Самый полный и актуальный рейтинг клавиатур и свитчей для Geometry Dash, поддерживаемый сообществом.</p>
+
+    <div class="stats" id="stats-container">
+      <div class="stat-item">
+        <span class="number" id="stat-keyboards">—</span>
+        <span class="label">Клавиатур</span>
+      </div>
+      <div class="stat-item">
+        <span class="number" id="stat-switches">—</span>
+        <span class="label">Свитчей</span>
+      </div>
+      <div class="stat-item">
+        <span class="number" id="stat-proposals">—</span>
+        <span class="label">Предложений</span>
+      </div>
+    </div>
+
+    <div class="hero-actions">
+      <button class="btn btn-primary" onclick="showTab('keyboards')">⌨️ Список клавиатур</button>
+      <button class="btn btn-primary" onclick="showTab('switches')">🔄 Список свитчей</button>
+      <button class="btn" onclick="showTab('new')">➕ Предложить изменение</button>
+    </div>
+
+    <div class="social-links">
+      <a href="#" target="_blank">Discord</a>
+      <a href="#" target="_blank">Telegram</a>
+      <a href="#" target="_blank">GitHub</a>
+    </div>
+  </div>
+</div>
+
+<!-- ========== ВКЛАДКА: КЛАВИАТУРЫ ========== -->
+<div id="tab-keyboards" class="tab-content">
+  <div id="keyboards-container"><p class="small">Загрузка...</p></div>
+</div>
+
+<!-- ========== ВКЛАДКА: СВИТЧИ ========== -->
+<div id="tab-switches" class="tab-content">
+  <div id="switches-container"><p class="small">Загрузка...</p></div>
+</div>
+
+<!-- ========== ВКЛАДКА: ПРЕДЛОЖЕНИЯ ========== -->
+<div id="tab-proposals" class="tab-content">
+  <div id="proposals-list"><p class="small">Загрузка...</p></div>
+</div>
+
+<!-- ========== ВКЛАДКА: ПРЕДЛОЖИТЬ ========== -->
+<div id="tab-new" class="tab-content">
+  <form id="proposal-form">
+    <label>Категория
+      <select id="p-category">
+        <option value="keyboard">Клавиатура</option>
+        <option value="switch">Свитч</option>
+      </select>
+    </label>
+    <label>Тип предложения
+      <select id="p-type">
+        <option value="add">Добавить новое</option>
+        <option value="edit">Изменить существующее</option>
+      </select>
+    </label>
+    <div id="edit-target-wrap" style="display:none">
+      <label>Что меняем
+        <select id="p-target"></select>
+      </label>
+    </div>
+    <div class="flex">
+      <label>Название <input id="p-name" required></label>
+      <label>Тир <input id="p-tier" placeholder="SS+, SS, S+, ..."></label>
+    </div>
+    <div class="flex">
+      <label>Формат <input id="p-format" placeholder="60%, 65%, TKL..."></label>
+      <label>Цена <input id="p-price"></label>
+    </div>
+    <div class="flex">
+      <label>Где купить (ссылка) <input id="p-buy" placeholder="https://..."></label>
+      <label>Свитчи (для клавиатур) <input id="p-switches"></label>
+    </div>
+    <div class="flex">
+      <label>Софт <input id="p-software"></label>
+      <label>Разработчик/чип <input id="p-dev"></label>
+    </div>
+    <div class="flex">
+      <label>Рекомендация <input id="p-recommend" placeholder="👑 / 🌟 / ➖ / ❌ / 🤡"></label>
+      <label>Ход / сила (для свитчей) <input id="p-travel-force" placeholder="3.5, 35г"></label>
+    </div>
+    <div class="flex">
+      <label>Стем / верх / низ (для свитчей) <input id="p-materials" placeholder="POM, PC, PA66"></label>
+      <label>Тестеры <input id="p-testers"></label>
+    </div>
+    <label>Подводные камни <textarea id="p-pitfalls" rows="2"></textarea></label>
+    <label>Примечание (для свитчей) <textarea id="p-notes" rows="2"></textarea></label>
+    <label>Почему стоит внести это изменение <textarea id="p-reason" rows="2"></textarea></label>
+    <div class="flex">
+      <label>Ваш ник <input id="p-author" placeholder="как вас подписать"></label>
+    </div>
+    <button type="submit">Отправить на рассмотрение</button>
+  </form>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script>
+// ============================================================
+//  ИНИЦИАЛИЗАЦИЯ
+// ============================================================
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+let currentView = localStorage.getItem('tierlist_view') || 'grid';
+let currentUser = null;
+let isAdmin = false;
+
+// ============================================================
+//  УТИЛИТЫ
+// ============================================================
+function getVoterId() {
+  let id = localStorage.getItem('voter_id');
+  if (!id) { id = crypto.randomUUID(); localStorage.setItem('voter_id', id); }
+  return id;
+}
+
+function linkify(text) {
+  if (!text) return '';
+  return text.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank">$1</a>');
+}
+
+function setView(view) {
+  currentView = view;
+  localStorage.setItem('tierlist_view', view);
+  document.getElementById('view-grid').classList.toggle('active', view === 'grid');
+  document.getElementById('view-list').classList.toggle('active', view === 'list');
+  if (document.getElementById('tab-keyboards').classList.contains('active')) loadKeyboards();
+  if (document.getElementById('tab-switches').classList.contains('active')) loadSwitches();
+}
+
+// ============================================================
+//  ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК
+// ============================================================
+function showTab(name) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tabs button').forEach(el => el.classList.remove('active'));
+
+  const tab = document.getElementById('tab-' + name);
+  if (tab) tab.classList.add('active');
+
+  const btn = document.getElementById('tab-btn-' + name);
+  if (btn) btn.classList.add('active');
+
+  if (name === 'home') loadStats();
+  if (name === 'keyboards') loadKeyboards();
+  if (name === 'switches') loadSwitches();
+  if (name === 'proposals') loadProposals();
+  if (name === 'new') updateTargetSelect();
+}
+
+// ============================================================
+//  АДМИНКА + АВТОРИЗАЦИЯ
+// ============================================================
+async function refreshAdminBar() {
+  const { data: { user } } = await sb.auth.getUser();
+  currentUser = user;
+  isAdmin = false;
+  if (user) {
+    const { data: adminRow } = await sb.from('admins').select('*').eq('user_id', user.id).maybeSingle();
+    isAdmin = !!adminRow;
+  }
+  const bar = document.getElementById('admin-bar');
+  if (currentUser) {
+    bar.innerHTML = `
+      <span>👤 ${currentUser.email} ${isAdmin ? '🔑 админ' : '(не админ)'}</span>
+      <button onclick="logout()">Выйти</button>
+    `;
+  } else {
+    bar.innerHTML = `
+      <input id="login-email" placeholder="email" type="email" style="width:160px;">
+      <input id="login-pass" placeholder="пароль" type="password" style="width:120px;">
+      <button onclick="login()">Войти</button>
+      <button onclick="loginGoogle()" class="google-btn">🔑 Войти через Google</button>
+    `;
+  }
+  if (document.getElementById('tab-proposals').classList.contains('active')) loadProposals();
+}
+
+async function login() {
+  const email = document.getElementById('login-email').value;
+  const password = document.getElementById('login-pass').value;
+  if (!email || !password) { alert('Введите email и пароль'); return; }
+  const { error } = await sb.auth.signInWithPassword({ email, password });
+  if (error) alert('Ошибка: ' + error.message);
+  else refreshAdminBar();
+}
+
+async function loginGoogle() {
+  const { error } = await sb.auth.signInWithOAuth({
+    provider: 'google',
+    options: { redirectTo: window.location.origin + window.location.pathname }
+  });
+  if (error) alert('Ошибка Google: ' + error.message);
+}
+
+async function logout() {
+  await sb.auth.signOut();
+  refreshAdminBar();
+}
+
+// ============================================================
+//  СТАТИСТИКА
+// ============================================================
+async function loadStats() {
+  try {
+    const [{ count: keyboards }, { count: switches }, { count: proposals }] = await Promise.all([
+      sb.from('devices').select('*', { count: 'exact', head: true }),
+      sb.from('switches').select('*', { count: 'exact', head: true }),
+      sb.from('proposals').select('*', { count: 'exact', head: true })
+    ]);
+    document.getElementById('stat-keyboards').textContent = keyboards || 0;
+    document.getElementById('stat-switches').textContent = switches || 0;
+    document.getElementById('stat-proposals').textContent = proposals || 0;
+  } catch (e) {
+    console.warn('Не удалось загрузить статистику', e);
+  }
+}
+
+// ============================================================
+//  СОРТИРОВКА ПО ТИРАМ
+// ============================================================
+const tierOrder = ['SS+', 'SS', 'S+', 'S', 'A+', 'A', 'B', 'C', 'D', 'F'];
+function sortByTier(items) {
+  return items.sort((a, b) => {
+    const getMainTier = (tier) => {
+      if (!tier) return '';
+      const parts = tier.split(/[\s\-]+/);
+      return parts[0];
+    };
+    const tierA = getMainTier(a.tier);
+    const tierB = getMainTier(b.tier);
+    const indexA = tierOrder.indexOf(tierA);
+    const indexB = tierOrder.indexOf(tierB);
+    if (indexA === -1 && indexB === -1) return 0;
+    if (indexA === -1) return 1;
+    if (indexB === -1) return -1;
+    return indexA - indexB;
+  });
+}
+
+// ============================================================
+//  РЕНДЕРИНГ (карточки и таблица)
+// ============================================================
+function renderCardGrid(items) {
+  if (!items || items.length === 0) return '<p class="small">Нет данных.</p>';
+  return `<div class="card-grid">${items.map(d => `
+    <div class="card">
+      <div class="tier">${d.tier || '?'}</div>
+      <div class="name">${d.name || 'без названия'}</div>
+      ${d.format ? `<div class="detail">📐 ${d.format}</div>` : ''}
+      ${d.price ? `<div class="detail">💰 ${d.price}</div>` : ''}
+      ${d.recommendation ? `<div class="detail">⭐ ${d.recommendation}</div>` : ''}
+      ${d.travel || d.force ? `<div class="detail">${d.travel || ''} ${d.force || ''}</div>` : ''}
+      ${d.notes ? `<div class="detail">📝 ${linkify(d.notes)}</div>` : ''}
+      ${d.pitfalls ? `<div class="detail" style="color:#e55;">⚠️ ${linkify(d.pitfalls)}</div>` : ''}
+      ${d.testers ? `<div class="detail">👥 ${linkify(d.testers)}</div>` : ''}
+      ${d.buy_url || d.buy_link ? `<div class="detail"><a href="${d.buy_url || d.buy_link}" target="_blank" style="color:#6af;">🛒 Купить</a></div>` : ''}
+    </div>
+  `).join('')}</div>`;
+}
+
+function renderTable(items) {
+  if (!items || items.length === 0) return '<p class="small">Нет данных.</p>';
+  const headers = ['Тир', 'Название', 'Формат', 'Цена', 'Рекомендация', 'Где купить', 'Свитчи', 'Софт', 'Разработчик', 'Тестеры', 'Подводные камни'];
+  const rows = items.map(d => {
+    const buy = d.buy_url || d.buy_link || '';
+    const buyHtml = buy ? `<a href="${buy}" target="_blank">Купить</a>` : '';
+    return `<tr>
+      <td>${d.tier || ''}</td>
+      <td>${d.name || ''}</td>
+      <td>${d.format || ''}</td>
+      <td>${d.price || ''}</td>
+      <td>${d.recommendation || ''}</td>
+      <td>${buyHtml}</td>
+      <td>${d.switches || ''}</td>
+      <td>${d.software || ''}</td>
+      <td>${d.developer || ''}</td>
+      <td>${linkify(d.testers || '')}</td>
+      <td>${linkify(d.pitfalls || '')}</td>
+    </tr>`;
+  }).join('');
+  return `<div class="table-wrap"><table><thead><tr><th>${headers.join('</th><th>')}</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+}
+
+// ============================================================
+//  ЗАГРУЗКА КЛАВИАТУР (ТАБЛИЦА devices)
+// ============================================================
+async function loadKeyboards() {
+  const container = document.getElementById('keyboards-container');
+  const { data, error } = await sb.from('devices').select('*');
+  if (error) { container.innerHTML = `<p class="small">Ошибка: ${error.message}</p>`; return; }
+  if (!data || data.length === 0) { container.innerHTML = `<p class="small">Нет данных. Добавьте клавиатуры через импорт или предложения.</p>`; return; }
+  const sorted = sortByTier(data);
+  container.innerHTML = currentView === 'grid' ? renderCardGrid(sorted) : renderTable(sorted);
+}
+
+// ============================================================
+//  ЗАГРУЗКА СВИТЧЕЙ (ТАБЛИЦА switches) — ИСПРАВЛЕННАЯ
+// ============================================================
+async function loadSwitches() {
+  const container = document.getElementById('switches-container');
+  const { data, error } = await sb.from('switches').select('*');
+  if (error) { container.innerHTML = `<p class="small">Ошибка: ${error.message}</p>`; return; }
+  if (!data || data.length === 0) { container.innerHTML = `<p class="small">Нет данных. Добавьте свитчи через импорт или предложения.</p>`; return; }
+  const sorted = sortByTier(data);
+  container.innerHTML = currentView === 'grid' ? renderCardGrid(sorted) : renderTable(sorted);
+}
+
+// ============================================================
+//  ПРЕДЛОЖЕНИЯ (полные плашки)
+// ============================================================
+async function loadProposals() {
+  const container = document.getElementById('proposals-list');
+  const { data: proposals, error } = await sb
+    .from('proposals')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) { container.innerHTML = `<p class="small">Ошибка: ${error.message}</p>`; return; }
+  if (!proposals || proposals.length === 0) {
+    container.innerHTML = `<p class="small">Пока нет предложений. Будьте первым!</p>`;
+    return;
+  }
+
+  container.innerHTML = '';
+  for (const p of proposals) {
+    const [{ data: likes }, { data: comments }] = await Promise.all([
+      sb.from('proposal_likes').select('id').eq('proposal_id', p.id),
+      sb.from('proposal_comments').select('*').eq('proposal_id', p.id).order('created_at', { ascending: true })
+    ]);
+
+    const div = document.createElement('div');
+    div.className = 'proposal-item';
+
+    const categoryLabel = p.category === 'switch' ? '🔄 Свитч' : '⌨️ Клавиатура';
+    const typeLabel = p.type === 'add' ? '➕ Новое' : '✏️ Изменение';
+    const statusClass = p.status;
+    const statusLabel = p.status === 'pending' ? '⏳ На рассмотрении' : p.status === 'approved' ? '✅ Одобрено' : '❌ Отклонено';
+
+    const payload = p.payload || {};
+    const fields = [
+      { label: 'Название', value: payload.name },
+      { label: 'Тир', value: payload.tier },
+      { label: 'Формат', value: payload.format },
+      { label: 'Цена', value: payload.price },
+      { label: 'Где купить', value: payload.buy_url || payload.buy_link },
+      { label: 'Свитчи', value: payload.switches },
+      { label: 'Софт', value: payload.software },
+      { label: 'Разработчик/чип', value: payload.developer },
+      { label: 'Рекомендация', value: payload.recommend },
+      { label: 'Ход/сила', value: payload.travel || payload.force ? `${payload.travel || ''} ${payload.force || ''}` : '' },
+      { label: 'Стем/верх/низ', value: payload.stem || payload.top_housing || payload.bottom_housing ? [payload.stem, payload.top_housing, payload.bottom_housing].filter(Boolean).join(', ') : '' },
+      { label: 'Тестеры', value: payload.testers },
+      { label: 'Примечание', value: payload.notes },
+      { label: 'Подводные камни', value: payload.pitfalls },
+    ].filter(f => f.value);
+
+    let fieldsHtml = fields.map(f =>
+      `<div class="field"><span class="label">${f.label}:</span> <span class="value">${linkify(f.value)}</span></div>`
+    ).join('');
+
+    div.innerHTML = `
+      <div class="proposal-header">
+        <span class="title">${categoryLabel} — ${typeLabel}</span>
+        <span class="meta">
+          от ${p.author_name || 'аноним'} · ${new Date(p.created_at).toLocaleString('ru')}
+          <span class="status-badge ${statusClass}">${statusLabel}</span>
+        </span>
+      </div>
+      ${p.reason ? `<div style="color:#aaa; font-size:13px; margin-bottom:6px;">💬 Причина: ${p.reason}</div>` : ''}
+      <div class="proposal-fields">${fieldsHtml}</div>
+      <div class="proposal-actions">
+        <button onclick="likeProposal('${p.id}')">👍 ${likes ? likes.length : 0}</button>
+        <span class="small">💬 ${comments ? comments.length : 0}</span>
+        ${isAdmin && p.status === 'pending' ? `
+          <button onclick="resolveProposal('${p.id}', 'approved')" style="border-color:#3a6;">✅ Принять</button>
+          <button onclick="resolveProposal('${p.id}', 'rejected')" style="border-color:#e55;">❌ Отклонить</button>
+        ` : ''}
+        ${isAdmin ? `<button onclick="deleteProposal('${p.id}')" class="delete-btn">🗑️ Удалить</button>` : ''}
+      </div>
+      <div class="comments">
+        ${(comments || []).map(c => `<div class="comment"><b>${c.author_name || 'аноним'}:</b> ${c.text}</div>`).join('')}
+      </div>
+      <form onsubmit="return addComment(event, '${p.id}')" style="margin-top:8px; background:transparent; padding:0;">
+        <input placeholder="Ваш ник" class="c-author" style="width:120px; display:inline-block; background:#222; border:1px solid #444; color:#eee; padding:4px 8px; border-radius:4px;">
+        <input placeholder="Комментарий" class="c-text" style="width:calc(100% - 260px); display:inline-block; background:#222; border:1px solid #444; color:#eee; padding:4px 8px; border-radius:4px;" required>
+        <button type="submit" style="display:inline-block; width:auto; padding:4px 12px;">Отправить</button>
+      </form>
+    `;
+    container.appendChild(div);
+  }
+}
+
+// ============================================================
+//  ДЕЙСТВИЯ С ПРЕДЛОЖЕНИЯМИ
+// ============================================================
+async function likeProposal(id) {
+  const voter_id = getVoterId();
+  const { error } = await sb.from('proposal_likes').insert({ proposal_id: id, voter_id });
+  if (error && !error.message.includes('duplicate')) alert(error.message);
+  loadProposals();
+}
+
+async function addComment(e, proposalId) {
+  e.preventDefault();
+  const form = e.target;
+  const author_name = form.querySelector('.c-author').value;
+  const text = form.querySelector('.c-text').value;
+  await sb.from('proposal_comments').insert({ proposal_id: proposalId, author_name, text });
+  loadProposals();
+  return false;
+}
+
+async function resolveProposal(id, status) {
+  const { data: proposal } = await sb.from('proposals').select('*').eq('id', id).single();
+  if (!proposal) return;
+
+  if (status === 'approved') {
+    const payload = proposal.payload || {};
+    if (proposal.category === 'switch') {
+      await sb.from('switches').insert({
+        name: payload.name,
+        tier: payload.tier,
+        price: payload.price,
+        buy_url: payload.buy_url,
+        recommend: payload.recommend,
+        travel: payload.travel,
+        force: payload.force,
+        stem: payload.stem,
+        top_housing: payload.top_housing,
+        bottom_housing: payload.bottom_housing,
+        notes: payload.notes,
+        testers: payload.testers,
+        pitfalls: payload.pitfalls
+      });
+    } else {
+      await sb.from('devices').insert({
+        name: payload.name,
+        tier: payload.tier,
+        format: payload.format,
+        price: payload.price,
+        buy_url: payload.buy_url,
+        switches: payload.switches,
+        software: payload.software,
+        developer: payload.developer,
+        pitfalls: payload.pitfalls,
+        testers: payload.testers,
+        recommendation: payload.recommend
+      });
+    }
+  }
+
+  await sb.from('proposals').update({
+    status,
+    resolved_at: new Date().toISOString(),
+    resolved_by: currentUser ? currentUser.email : null
+  }).eq('id', id);
+
+  loadKeyboards();
+  loadSwitches();
+  loadProposals();
+}
+
+async function deleteProposal(id) {
+  if (!confirm('Удалить это предложение навсегда?')) return;
+  const { error } = await sb.from('proposals').delete().eq('id', id);
+  if (error) { alert('Ошибка удаления: ' + error.message); return; }
+  loadProposals();
+}
+
+// ============================================================
+//  ФОРМА ПРЕДЛОЖЕНИЯ
+// ============================================================
+async function updateTargetSelect() {
+  const category = document.getElementById('p-category').value;
+  const select = document.getElementById('p-target');
+  const table = category === 'switch' ? 'switches' : 'devices';
+  const { data, error } = await sb.from(table).select('id, name').order('name');
+  if (error) { select.innerHTML = `<option>Ошибка</option>`; return; }
+  select.innerHTML = (data || []).map(d => `<option value="${d.id}">${d.name}</option>`).join('');
+}
+
+document.getElementById('p-category').addEventListener('change', () => updateTargetSelect());
+document.getElementById('p-type').addEventListener('change', e => {
+  document.getElementById('edit-target-wrap').style.display = e.target.value === 'edit' ? 'block' : 'none';
+  if (e.target.value === 'edit') updateTargetSelect();
+});
+
+document.getElementById('proposal-form').addEventListener('submit', async e => {
+  e.preventDefault();
+
+  const category = document.getElementById('p-category').value;
+  const type = document.getElementById('p-type').value;
+  const target_id = type === 'edit' ? document.getElementById('p-target').value : null;
+
+  const payload = {
+    name: document.getElementById('p-name').value,
+    tier: document.getElementById('p-tier').value,
+    format: document.getElementById('p-format').value,
+    price: document.getElementById('p-price').value,
+    buy_url: document.getElementById('p-buy').value,
+    switches: document.getElementById('p-switches').value,
+    software: document.getElementById('p-software').value,
+    developer: document.getElementById('p-dev').value,
+    recommend: document.getElementById('p-recommend').value,
+    travel: document.getElementById('p-travel-force').value,
+    notes: document.getElementById('p-notes').value,
+    testers: document.getElementById('p-testers').value,
+    pitfalls: document.getElementById('p-pitfalls').value,
+  };
+
+  if (category === 'switch') {
+    const materials = document.getElementById('p-materials').value.split(',').map(s => s.trim());
+    payload.stem = materials[0] || '';
+    payload.top_housing = materials[1] || '';
+    payload.bottom_housing = materials[2] || '';
+  }
+
+  const reason = document.getElementById('p-reason').value;
+  const author_name = document.getElementById('p-author').value;
+
+  const { error } = await sb.from('proposals').insert({
+    type,
+    category,
+    target_device_id: target_id,
+    target_table: category === 'switch' ? 'switches' : 'devices',
+    payload,
+    reason,
+    author_name,
+    status: 'pending'
+  });
+
+  if (error) { alert('Ошибка: ' + error.message); return; }
+
+  alert('✅ Предложение отправлено!');
+  e.target.reset();
+  document.getElementById('edit-target-wrap').style.display = 'none';
+  showTab('proposals');
+  loadProposals();
+});
+
+// ============================================================
+//  ИНИЦИАЛИЗАЦИЯ
+// ============================================================
+document.getElementById('view-grid').classList.toggle('active', currentView === 'grid');
+document.getElementById('view-list').classList.toggle('active', currentView === 'list');
+
+refreshAdminBar();
+loadStats();
+loadKeyboards();
+loadSwitches();
+loadProposals();
+
+sb.auth.onAuthStateChange((event, session) => {
+  if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+    refreshAdminBar();
+    loadStats();
+  }
+});
+</script>
+</body>
+</html>
