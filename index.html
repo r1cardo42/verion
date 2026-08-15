@@ -173,8 +173,9 @@
   .card .detail a { color: #6af; text-decoration: underline; }
 
   .table-wrap { overflow-x: auto; margin-top: 12px; }
-  .table-wrap table { width: 100%; border-collapse: collapse; font-size: 13px; }
-  .table-wrap th, .table-wrap td { border: 1px solid #333; padding: 6px 8px; text-align: left; vertical-align: top; }
+  .table-wrap table { width: 100%; border-collapse: collapse; font-size: 13px; table-layout: auto; }
+  .table-wrap th, .table-wrap td { border: 1px solid #333; padding: 6px 8px; text-align: left; vertical-align: top; word-break: break-word; overflow-wrap: anywhere; max-width: 220px; }
+  .table-wrap td a { color: #6af; text-decoration: underline; white-space: nowrap; }
   .table-wrap th { background: #1c1c1c; }
   .table-wrap tr:nth-child(even) { background: #181818; }
 
@@ -456,6 +457,41 @@ function linkify(text) {
   return text.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank">$1</a>');
 }
 
+// Известные магазины и софт -> ссылки на их сайты.
+// Дополняй этот список своими значениями по мере надобности.
+const KNOWN_LINKS = {
+  'ozon': 'https://www.ozon.ru',
+  'aliexpress': 'https://aliexpress.com',
+  'taobao': 'https://www.taobao.com',
+  'bilibili': 'https://www.bilibili.com',
+  'goofish': 'https://www.goofish.com',
+  'авито': 'https://www.avito.ru',
+  'avito': 'https://www.avito.ru',
+  'dns': 'https://www.dns-shop.ru',
+  'offcial site': null,   // нет единого сайта — оставляем как текст
+  'official site': null,
+  'vgn hub': 'https://vgn.gg',
+  'wootility': 'https://wootility.io',
+  'atk': 'https://www.atkgear.com',
+  'mchose hub': 'https://mchose.com',
+  'aula hub': 'https://www.aulacn.com',
+  'chilkey hub': 'https://chilkey.com',
+};
+
+// Если текст (уже содержит ссылку ИЛИ совпадает с известным названием) -
+// делаем кликабельным. Иначе просто выводим текст как есть.
+function autoLink(text) {
+  if (!text) return '';
+  // если внутри уже есть http-ссылка — просто линкуем её
+  if (/https?:\/\//.test(text)) return linkify(text);
+
+  const key = text.trim().toLowerCase();
+  if (KNOWN_LINKS[key]) {
+    return `<a href="${KNOWN_LINKS[key]}" target="_blank">${text}</a>`;
+  }
+  return text;
+}
+
 function setView(view) {
   currentView = view;
   localStorage.setItem('tierlist_view', view);
@@ -591,7 +627,8 @@ function renderCardGrid(items) {
       ${d.notes ? `<div class="detail">📝 ${linkify(d.notes)}</div>` : ''}
       ${d.pitfalls ? `<div class="detail" style="color:#e55;">⚠️ ${linkify(d.pitfalls)}</div>` : ''}
       ${d.testers ? `<div class="detail">👥 ${linkify(d.testers)}</div>` : ''}
-      ${d.buy_url || d.buy_link ? `<div class="detail"><a href="${d.buy_url || d.buy_link}" target="_blank" style="color:#6af;">🛒 Купить</a></div>` : ''}
+      ${d.buy_url || d.buy_link ? `<div class="detail">🛒 ${autoLink(d.buy_url || d.buy_link)}</div>` : ''}
+      ${d.software ? `<div class="detail">💻 ${autoLink(d.software)}</div>` : ''}
     </div>
   `).join('')}</div>`;
 }
@@ -601,17 +638,40 @@ function renderTable(items) {
   const headers = ['Тир', 'Название', 'Формат', 'Цена', 'Рекомендация', 'Где купить', 'Свитчи', 'Софт', 'Разработчик', 'Тестеры', 'Подводные камни'];
   const rows = items.map(d => {
     const buy = d.buy_url || d.buy_link || '';
-    const buyHtml = buy ? `<a href="${buy}" target="_blank">Купить</a>` : '';
     return `<tr>
       <td>${d.tier || ''}</td>
       <td>${d.name || ''}</td>
       <td>${d.format || ''}</td>
       <td>${d.price || ''}</td>
       <td>${d.recommendation || ''}</td>
-      <td>${buyHtml}</td>
+      <td>${autoLink(buy)}</td>
       <td>${d.switches || ''}</td>
-      <td>${d.software || ''}</td>
+      <td>${autoLink(d.software || '')}</td>
       <td>${d.developer || ''}</td>
+      <td>${linkify(d.testers || '')}</td>
+      <td>${linkify(d.pitfalls || '')}</td>
+    </tr>`;
+  }).join('');
+  return `<div class="table-wrap"><table><thead><tr><th>${headers.join('</th><th>')}</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+}
+
+function renderSwitchTable(items) {
+  if (!items || items.length === 0) return '<p class="small">Нет данных.</p>';
+  const headers = ['Тир', 'Название', 'Цена', 'Рекомендация', 'Где купить', 'Ход', 'Сила', 'Stem', 'Top', 'Bottom', 'Примечание', 'Тестеры', 'Подводные камни'];
+  const rows = items.map(d => {
+    const buy = d.buy_url || d.buy_link || '';
+    return `<tr>
+      <td>${d.tier || ''}</td>
+      <td>${d.name || ''}</td>
+      <td>${d.price || ''}</td>
+      <td>${d.recommendation || d.recommend || ''}</td>
+      <td>${autoLink(buy)}</td>
+      <td>${d.travel || ''}</td>
+      <td>${d.force || ''}</td>
+      <td>${d.stem || ''}</td>
+      <td>${d.top_housing || ''}</td>
+      <td>${d.bottom_housing || ''}</td>
+      <td>${linkify(d.notes || '')}</td>
       <td>${linkify(d.testers || '')}</td>
       <td>${linkify(d.pitfalls || '')}</td>
     </tr>`;
@@ -632,7 +692,7 @@ async function loadKeyboards() {
 }
 
 // ============================================================
-//  ЗАГРУЗКА СВИТЧЕЙ (ТАБЛИЦА switches) — ИСПРАВЛЕННАЯ
+//  ЗАГРУЗКА СВИТЧЕЙ (ТАБЛИЦА switches)
 // ============================================================
 async function loadSwitches() {
   const container = document.getElementById('switches-container');
@@ -640,7 +700,7 @@ async function loadSwitches() {
   if (error) { container.innerHTML = `<p class="small">Ошибка: ${error.message}</p>`; return; }
   if (!data || data.length === 0) { container.innerHTML = `<p class="small">Нет данных. Добавьте свитчи через импорт или предложения.</p>`; return; }
   const sorted = sortByTier(data);
-  container.innerHTML = currentView === 'grid' ? renderCardGrid(sorted) : renderTable(sorted);
+  container.innerHTML = currentView === 'grid' ? renderCardGrid(sorted) : renderSwitchTable(sorted);
 }
 
 // ============================================================
@@ -692,9 +752,11 @@ async function loadProposals() {
       { label: 'Подводные камни', value: payload.pitfalls },
     ].filter(f => f.value);
 
-    let fieldsHtml = fields.map(f =>
-      `<div class="field"><span class="label">${f.label}:</span> <span class="value">${linkify(f.value)}</span></div>`
-    ).join('');
+    let fieldsHtml = fields.map(f => {
+      const isLinkableField = f.label === 'Где купить' || f.label === 'Софт';
+      const val = isLinkableField ? autoLink(f.value) : linkify(f.value);
+      return `<div class="field"><span class="label">${f.label}:</span> <span class="value">${val}</span></div>`;
+    }).join('');
 
     div.innerHTML = `
       <div class="proposal-header">
