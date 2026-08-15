@@ -8,7 +8,8 @@
   * { box-sizing: border-box; }
   body {
     font-family: system-ui, Arial, sans-serif;
-    max-width: 1100px;
+    max-width: 1500px;
+    width: 96%;
     margin: 20px auto;
     padding: 0 16px;
     background: #111;
@@ -379,53 +380,87 @@
 
 <!-- ========== ВКЛАДКА: ПРЕДЛОЖИТЬ ========== -->
 <div id="tab-new" class="tab-content">
-  <form id="proposal-form">
-    <label>Категория
-      <select id="p-category">
-        <option value="keyboard">Клавиатура</option>
-        <option value="switch">Свитч</option>
-      </select>
-    </label>
+  <div class="tabs" style="margin-bottom:16px;">
+    <button id="new-subtab-btn-keyboard" class="active" onclick="showNewSubtab('keyboard')">⌨️ Клавиатура</button>
+    <button id="new-subtab-btn-switch" onclick="showNewSubtab('switch')">🔄 Свитч</button>
+  </div>
+
+  <!-- ---- Форма: КЛАВИАТУРА ---- -->
+  <form id="proposal-form-keyboard">
     <label>Тип предложения
-      <select id="p-type">
-        <option value="add">Добавить новое</option>
-        <option value="edit">Изменить существующее</option>
+      <select id="kb-type">
+        <option value="add">Добавить новую клавиатуру</option>
+        <option value="edit">Изменить существующую</option>
       </select>
     </label>
-    <div id="edit-target-wrap" style="display:none">
-      <label>Что меняем
-        <select id="p-target"></select>
-      </label>
+    <div id="kb-edit-target-wrap" style="display:none">
+      <label>Какую клавиатуру меняем <select id="kb-target"></select></label>
     </div>
     <div class="flex">
-      <label>Название <input id="p-name" required></label>
-      <label>Тир <input id="p-tier" placeholder="SS+, SS, S+, ..."></label>
+      <label>Название <input id="kb-name" required></label>
+      <label>Тир <input id="kb-tier" placeholder="SS+, SS, S+, ..."></label>
     </div>
     <div class="flex">
-      <label>Формат <input id="p-format" placeholder="60%, 65%, TKL..."></label>
-      <label>Цена <input id="p-price"></label>
+      <label>Формат <input id="kb-format" placeholder="60%, 65%, TKL..."></label>
+      <label>Цена <input id="kb-price"></label>
     </div>
     <div class="flex">
-      <label>Где купить (ссылка) <input id="p-buy" placeholder="https://..."></label>
-      <label>Свитчи (для клавиатур) <input id="p-switches"></label>
+      <label>Где купить (ссылка) <input id="kb-buy" placeholder="https://..."></label>
+      <label>Свитчи <input id="kb-switches"></label>
     </div>
     <div class="flex">
-      <label>Софт <input id="p-software"></label>
-      <label>Разработчик/чип <input id="p-dev"></label>
+      <label>Софт <input id="kb-software"></label>
+      <label>Разработчик/чип <input id="kb-dev"></label>
     </div>
     <div class="flex">
-      <label>Рекомендация <input id="p-recommend" placeholder="👑 / 🌟 / ➖ / ❌ / 🤡"></label>
-      <label>Ход / сила (для свитчей) <input id="p-travel-force" placeholder="3.5, 35г"></label>
+      <label>Рекомендация <input id="kb-recommend" placeholder="👑 / 🌟 / ➖ / ❌ / 🤡"></label>
+      <label>Тестеры <input id="kb-testers"></label>
+    </div>
+    <label>Подводные камни <textarea id="kb-pitfalls" rows="2"></textarea></label>
+    <label>Почему стоит внести это изменение <textarea id="kb-reason" rows="2"></textarea></label>
+    <div class="flex">
+      <label>Ваш ник <input id="kb-author" placeholder="как вас подписать"></label>
+    </div>
+    <button type="submit">Отправить на рассмотрение</button>
+  </form>
+
+  <!-- ---- Форма: СВИТЧ ---- -->
+  <form id="proposal-form-switch" style="display:none">
+    <label>Тип предложения
+      <select id="sw-type">
+        <option value="add">Добавить новый свитч</option>
+        <option value="edit">Изменить существующий</option>
+      </select>
+    </label>
+    <div id="sw-edit-target-wrap" style="display:none">
+      <label>Какой свитч меняем <select id="sw-target"></select></label>
     </div>
     <div class="flex">
-      <label>Стем / верх / низ (для свитчей) <input id="p-materials" placeholder="POM, PC, PA66"></label>
-      <label>Тестеры <input id="p-testers"></label>
+      <label>Название <input id="sw-name" required></label>
+      <label>Тир <input id="sw-tier" placeholder="SS+, SS, S+, ..."></label>
     </div>
-    <label>Подводные камни <textarea id="p-pitfalls" rows="2"></textarea></label>
-    <label>Примечание (для свитчей) <textarea id="p-notes" rows="2"></textarea></label>
-    <label>Почему стоит внести это изменение <textarea id="p-reason" rows="2"></textarea></label>
     <div class="flex">
-      <label>Ваш ник <input id="p-author" placeholder="как вас подписать"></label>
+      <label>Цена <input id="sw-price"></label>
+      <label>Где купить (ссылка) <input id="sw-buy" placeholder="https://..."></label>
+    </div>
+    <div class="flex">
+      <label>Ход свитча <input id="sw-travel" placeholder="3.5"></label>
+      <label>Сила нажатия <input id="sw-force" placeholder="35г"></label>
+    </div>
+    <div class="flex">
+      <label>Stem <input id="sw-stem" placeholder="POM"></label>
+      <label>Top housing <input id="sw-top" placeholder="PC"></label>
+    </div>
+    <div class="flex">
+      <label>Bottom housing <input id="sw-bottom" placeholder="PA66"></label>
+      <label>Рекомендация <input id="sw-recommend" placeholder="👑 / 🌟 / ➖ / ❌ / 🤡"></label>
+    </div>
+    <label>Тестеры <input id="sw-testers"></label>
+    <label>Примечание <textarea id="sw-note" rows="2"></textarea></label>
+    <label>Подводные камни <textarea id="sw-pitfalls" rows="2"></textarea></label>
+    <label>Почему стоит внести это изменение <textarea id="sw-reason" rows="2"></textarea></label>
+    <div class="flex">
+      <label>Ваш ник <input id="sw-author" placeholder="как вас подписать"></label>
     </div>
     <button type="submit">Отправить на рассмотрение</button>
   </form>
@@ -438,6 +473,7 @@
 //  ИНИЦИАЛИЗАЦИЯ
 // ============================================================
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
 
 let currentView = localStorage.getItem('tierlist_view') || 'grid';
 let currentUser = null;
@@ -518,7 +554,7 @@ function showTab(name) {
   if (name === 'keyboards') loadKeyboards();
   if (name === 'switches') loadSwitches();
   if (name === 'proposals') loadProposals();
-  if (name === 'new') updateTargetSelect();
+  if (name === 'new') showNewSubtab('keyboard');
 }
 
 // ============================================================
@@ -868,61 +904,54 @@ async function deleteProposal(id) {
 }
 
 // ============================================================
-//  ФОРМА ПРЕДЛОЖЕНИЯ
+//  ФОРМА ПРЕДЛОЖЕНИЯ (две отдельные формы: клавиатура / свитч)
 // ============================================================
-async function updateTargetSelect() {
-  const category = document.getElementById('p-category').value;
-  const select = document.getElementById('p-target');
-  const table = category === 'switch' ? 'switches' : 'devices';
+function showNewSubtab(cat) {
+  document.getElementById('proposal-form-keyboard').style.display = cat === 'keyboard' ? 'block' : 'none';
+  document.getElementById('proposal-form-switch').style.display = cat === 'switch' ? 'block' : 'none';
+  document.getElementById('new-subtab-btn-keyboard').classList.toggle('active', cat === 'keyboard');
+  document.getElementById('new-subtab-btn-switch').classList.toggle('active', cat === 'switch');
+}
+
+async function fillTargetSelect(selectId, table) {
+  const select = document.getElementById(selectId);
   const { data, error } = await sb.from(table).select('id, name').order('name');
   if (error) { select.innerHTML = `<option>Ошибка</option>`; return; }
   select.innerHTML = (data || []).map(d => `<option value="${d.id}">${d.name}</option>`).join('');
 }
 
-document.getElementById('p-category').addEventListener('change', () => updateTargetSelect());
-document.getElementById('p-type').addEventListener('change', e => {
-  document.getElementById('edit-target-wrap').style.display = e.target.value === 'edit' ? 'block' : 'none';
-  if (e.target.value === 'edit') updateTargetSelect();
+// --- Клавиатура ---
+document.getElementById('kb-type').addEventListener('change', e => {
+  document.getElementById('kb-edit-target-wrap').style.display = e.target.value === 'edit' ? 'block' : 'none';
+  if (e.target.value === 'edit') fillTargetSelect('kb-target', 'devices');
 });
 
-document.getElementById('proposal-form').addEventListener('submit', async e => {
+document.getElementById('proposal-form-keyboard').addEventListener('submit', async e => {
   e.preventDefault();
-
-  const category = document.getElementById('p-category').value;
-  const type = document.getElementById('p-type').value;
-  const target_id = type === 'edit' ? document.getElementById('p-target').value : null;
+  const type = document.getElementById('kb-type').value;
+  const target_id = type === 'edit' ? document.getElementById('kb-target').value : null;
 
   const payload = {
-    name: document.getElementById('p-name').value,
-    tier: document.getElementById('p-tier').value,
-    format: document.getElementById('p-format').value,
-    price: document.getElementById('p-price').value,
-    buy_url: document.getElementById('p-buy').value,
-    switches: document.getElementById('p-switches').value,
-    software: document.getElementById('p-software').value,
-    developer: document.getElementById('p-dev').value,
-    recommend: document.getElementById('p-recommend').value,
-    travel: document.getElementById('p-travel-force').value,
-    notes: document.getElementById('p-notes').value,
-    testers: document.getElementById('p-testers').value,
-    pitfalls: document.getElementById('p-pitfalls').value,
+    name: document.getElementById('kb-name').value,
+    tier: document.getElementById('kb-tier').value,
+    format: document.getElementById('kb-format').value,
+    price: document.getElementById('kb-price').value,
+    buy_url: document.getElementById('kb-buy').value,
+    switches: document.getElementById('kb-switches').value,
+    software: document.getElementById('kb-software').value,
+    developer: document.getElementById('kb-dev').value,
+    recommend: document.getElementById('kb-recommend').value,
+    testers: document.getElementById('kb-testers').value,
+    pitfalls: document.getElementById('kb-pitfalls').value,
   };
-
-  if (category === 'switch') {
-    const materials = document.getElementById('p-materials').value.split(',').map(s => s.trim());
-    payload.stem = materials[0] || '';
-    payload.top_housing = materials[1] || '';
-    payload.bottom_housing = materials[2] || '';
-  }
-
-  const reason = document.getElementById('p-reason').value;
-  const author_name = document.getElementById('p-author').value;
+  const reason = document.getElementById('kb-reason').value;
+  const author_name = document.getElementById('kb-author').value;
 
   const { error } = await sb.from('proposals').insert({
     type,
-    category,
+    category: 'keyboard',
     target_device_id: target_id,
-    target_table: category === 'switch' ? 'switches' : 'devices',
+    target_table: 'devices',
     payload,
     reason,
     author_name,
@@ -933,7 +962,56 @@ document.getElementById('proposal-form').addEventListener('submit', async e => {
 
   alert('✅ Предложение отправлено!');
   e.target.reset();
-  document.getElementById('edit-target-wrap').style.display = 'none';
+  document.getElementById('kb-edit-target-wrap').style.display = 'none';
+  showTab('proposals');
+  loadProposals();
+});
+
+// --- Свитч ---
+document.getElementById('sw-type').addEventListener('change', e => {
+  document.getElementById('sw-edit-target-wrap').style.display = e.target.value === 'edit' ? 'block' : 'none';
+  if (e.target.value === 'edit') fillTargetSelect('sw-target', 'switches');
+});
+
+document.getElementById('proposal-form-switch').addEventListener('submit', async e => {
+  e.preventDefault();
+  const type = document.getElementById('sw-type').value;
+  const target_id = type === 'edit' ? document.getElementById('sw-target').value : null;
+
+  const payload = {
+    name: document.getElementById('sw-name').value,
+    tier: document.getElementById('sw-tier').value,
+    price: document.getElementById('sw-price').value,
+    buy_url: document.getElementById('sw-buy').value,
+    travel: document.getElementById('sw-travel').value,
+    force: document.getElementById('sw-force').value,
+    stem: document.getElementById('sw-stem').value,
+    top_housing: document.getElementById('sw-top').value,
+    bottom_housing: document.getElementById('sw-bottom').value,
+    recommend: document.getElementById('sw-recommend').value,
+    testers: document.getElementById('sw-testers').value,
+    notes: document.getElementById('sw-note').value,
+    pitfalls: document.getElementById('sw-pitfalls').value,
+  };
+  const reason = document.getElementById('sw-reason').value;
+  const author_name = document.getElementById('sw-author').value;
+
+  const { error } = await sb.from('proposals').insert({
+    type,
+    category: 'switch',
+    target_device_id: target_id,
+    target_table: 'switches',
+    payload,
+    reason,
+    author_name,
+    status: 'pending'
+  });
+
+  if (error) { alert('Ошибка: ' + error.message); return; }
+
+  alert('✅ Предложение отправлено!');
+  e.target.reset();
+  document.getElementById('sw-edit-target-wrap').style.display = 'none';
   showTab('proposals');
   loadProposals();
 });
