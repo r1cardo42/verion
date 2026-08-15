@@ -421,7 +421,10 @@
     <div class="flex">
       <label>Ваш ник <input id="kb-author" placeholder="как вас подписать"></label>
     </div>
-    <button type="submit">Отправить на рассмотрение</button>
+    <div class="flex">
+      <button type="submit">Отправить на рассмотрение</button>
+      <button type="button" onclick="resetForm('keyboard')" style="background:#333; color:#eee;">↺ Сбросить всё</button>
+    </div>
   </form>
 
   <!-- ---- Форма: СВИТЧ ---- -->
@@ -462,7 +465,10 @@
     <div class="flex">
       <label>Ваш ник <input id="sw-author" placeholder="как вас подписать"></label>
     </div>
-    <button type="submit">Отправить на рассмотрение</button>
+    <div class="flex">
+      <button type="submit">Отправить на рассмотрение</button>
+      <button type="button" onclick="resetForm('switch')" style="background:#333; color:#eee;">↺ Сбросить всё</button>
+    </div>
   </form>
 </div>
 
@@ -528,6 +534,13 @@ function autoLink(text) {
   return text;
 }
 
+function resetForm(cat) {
+  const formId = cat === 'switch' ? 'proposal-form-switch' : 'proposal-form-keyboard';
+  const wrapId = cat === 'switch' ? 'sw-edit-target-wrap' : 'kb-edit-target-wrap';
+  document.getElementById(formId).reset();
+  document.getElementById(wrapId).style.display = 'none';
+}
+
 function setView(view) {
   currentView = view;
   localStorage.setItem('tierlist_view', view);
@@ -542,13 +555,15 @@ function setView(view) {
 // ============================================================
 function showTab(name) {
   document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-  document.querySelectorAll('.tabs button').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tabs > button').forEach(el => el.classList.remove('active'));
 
   const tab = document.getElementById('tab-' + name);
   if (tab) tab.classList.add('active');
 
   const btn = document.getElementById('tab-btn-' + name);
   if (btn) btn.classList.add('active');
+
+  localStorage.setItem('tierlist_tab', name);
 
   if (name === 'home') loadStats();
   if (name === 'keyboards') loadKeyboards();
@@ -579,7 +594,8 @@ async function refreshAdminBar() {
       <input id="login-email" placeholder="email" type="email" style="width:160px;">
       <input id="login-pass" placeholder="пароль" type="password" style="width:120px;">
       <button onclick="login()">Войти</button>
-      <button onclick="loginGoogle()" class="google-btn">🔑 Войти через Google</button>
+      <button onclick="signUp()" style="background:#333;">Зарегистрироваться</button>
+      <button onclick="loginGoogle()" class="google-btn">🔑 Продолжить с Google</button>
     `;
   }
   if (document.getElementById('tab-proposals').classList.contains('active')) loadProposals();
@@ -592,6 +608,25 @@ async function login() {
   const { error } = await sb.auth.signInWithPassword({ email, password });
   if (error) alert('Ошибка: ' + error.message);
   else refreshAdminBar();
+}
+
+async function signUp() {
+  const email = document.getElementById('login-email').value;
+  const password = document.getElementById('login-pass').value;
+  if (!email || !password) { alert('Введите email и пароль'); return; }
+  if (password.length < 6) { alert('Пароль должен быть не короче 6 символов'); return; }
+  const { data, error } = await sb.auth.signUp({
+    email,
+    password,
+    options: { emailRedirectTo: window.location.origin + window.location.pathname }
+  });
+  if (error) { alert('Ошибка регистрации: ' + error.message); return; }
+  if (data.user && !data.session) {
+    alert('Регистрация почти готова! Проверьте почту (' + email + ') и подтвердите email по ссылке, затем нажмите "Войти".');
+  } else {
+    alert('✅ Аккаунт создан и вы вошли!');
+    refreshAdminBar();
+  }
 }
 
 async function loginGoogle() {
@@ -650,9 +685,20 @@ function sortByTier(items) {
 // ============================================================
 //  РЕНДЕРИНГ (карточки и таблица)
 // ============================================================
+function toggleDetails(id) {
+  const el = document.getElementById('details-' + id);
+  if (!el) return;
+  const btn = document.getElementById('details-btn-' + id);
+  const isOpen = el.style.display === 'block';
+  el.style.display = isOpen ? 'none' : 'block';
+  if (btn) btn.textContent = isOpen ? '📖 Подробнее' : '📖 Скрыть';
+}
+
 function renderCardGrid(items) {
   if (!items || items.length === 0) return '<p class="small">Нет данных.</p>';
-  return `<div class="card-grid">${items.map(d => `
+  return `<div class="card-grid">${items.map(d => {
+    const hasDetails = d.notes || d.pitfalls;
+    return `
     <div class="card">
       <div class="tier">${d.tier || '?'}</div>
       <div class="name">${d.name || 'без названия'}</div>
@@ -660,20 +706,29 @@ function renderCardGrid(items) {
       ${d.price ? `<div class="detail">💰 ${d.price}</div>` : ''}
       ${d.recommendation ? `<div class="detail">⭐ ${d.recommendation}</div>` : ''}
       ${d.travel || d.force ? `<div class="detail">${d.travel || ''} ${d.force || ''}</div>` : ''}
-      ${d.notes ? `<div class="detail">📝 ${linkify(d.notes)}</div>` : ''}
-      ${d.pitfalls ? `<div class="detail" style="color:#e55;">⚠️ ${linkify(d.pitfalls)}</div>` : ''}
       ${d.testers ? `<div class="detail">👥 ${linkify(d.testers)}</div>` : ''}
       ${d.buy_url || d.buy_link ? `<div class="detail">🛒 ${autoLink(d.buy_url || d.buy_link)}</div>` : ''}
       ${d.software ? `<div class="detail">💻 ${autoLink(d.software)}</div>` : ''}
+      ${hasDetails ? `
+        <button id="details-btn-${d.id}" type="button" onclick="toggleDetails('${d.id}')" style="margin-top:8px; padding:4px 10px; font-size:12px; background:#222; border:1px solid #444; color:#eee; border-radius:4px; cursor:pointer;">📖 Подробнее</button>
+        <div id="details-${d.id}" style="display:none; margin-top:6px;">
+          ${d.notes ? `<div class="detail">📝 ${linkify(d.notes)}</div>` : ''}
+          ${d.pitfalls ? `<div class="detail" style="color:#e55;">⚠️ ${linkify(d.pitfalls)}</div>` : ''}
+        </div>
+      ` : ''}
     </div>
-  `).join('')}</div>`;
+  `;
+  }).join('')}</div>`;
 }
 
 function renderTable(items) {
   if (!items || items.length === 0) return '<p class="small">Нет данных.</p>';
-  const headers = ['Тир', 'Название', 'Формат', 'Цена', 'Рекомендация', 'Где купить', 'Свитчи', 'Софт', 'Разработчик', 'Тестеры', 'Подводные камни'];
+  const headers = ['Тир', 'Название', 'Формат', 'Цена', 'Рекомендация', 'Где купить', 'Свитчи', 'Софт', 'Разработчик', 'Тестеры', 'Инфо'];
   const rows = items.map(d => {
     const buy = d.buy_url || d.buy_link || '';
+    const hasDetails = d.pitfalls;
+    const detailsBtn = hasDetails ? `<button id="details-btn-${d.id}" type="button" onclick="toggleDetails('${d.id}')" style="padding:3px 10px; font-size:12px; background:#222; border:1px solid #444; color:#eee; border-radius:4px; cursor:pointer;">📖 Подробнее</button>` : '';
+    const detailsRow = hasDetails ? `<tr id="details-${d.id}" style="display:none;"><td colspan="${headers.length}" style="background:#151515;">${d.pitfalls ? `<div style="color:#e55;">⚠️ ${linkify(d.pitfalls)}</div>` : ''}</td></tr>` : '';
     return `<tr>
       <td>${d.tier || ''}</td>
       <td>${d.name || ''}</td>
@@ -685,17 +740,23 @@ function renderTable(items) {
       <td>${autoLink(d.software || '')}</td>
       <td>${d.developer || ''}</td>
       <td>${linkify(d.testers || '')}</td>
-      <td>${linkify(d.pitfalls || '')}</td>
-    </tr>`;
+      <td>${detailsBtn}</td>
+    </tr>${detailsRow}`;
   }).join('');
   return `<div class="table-wrap"><table><thead><tr><th>${headers.join('</th><th>')}</th></tr></thead><tbody>${rows}</tbody></table></div>`;
 }
 
 function renderSwitchTable(items) {
   if (!items || items.length === 0) return '<p class="small">Нет данных.</p>';
-  const headers = ['Тир', 'Название', 'Цена', 'Рекомендация', 'Где купить', 'Ход', 'Сила', 'Stem', 'Top', 'Bottom', 'Примечание', 'Тестеры', 'Подводные камни'];
+  const headers = ['Тир', 'Название', 'Цена', 'Рекомендация', 'Где купить', 'Ход', 'Сила', 'Stem', 'Top', 'Bottom', 'Тестеры', 'Инфо'];
   const rows = items.map(d => {
     const buy = d.buy_url || d.buy_link || '';
+    const hasDetails = d.notes || d.pitfalls;
+    const detailsBtn = hasDetails ? `<button id="details-btn-${d.id}" type="button" onclick="toggleDetails('${d.id}')" style="padding:3px 10px; font-size:12px; background:#222; border:1px solid #444; color:#eee; border-radius:4px; cursor:pointer;">📖 Подробнее</button>` : '';
+    const detailsRow = hasDetails ? `<tr id="details-${d.id}" style="display:none;"><td colspan="${headers.length}" style="background:#151515;">
+      ${d.notes ? `<div>📝 ${linkify(d.notes)}</div>` : ''}
+      ${d.pitfalls ? `<div style="color:#e55; margin-top:4px;">⚠️ ${linkify(d.pitfalls)}</div>` : ''}
+    </td></tr>` : '';
     return `<tr>
       <td>${d.tier || ''}</td>
       <td>${d.name || ''}</td>
@@ -707,10 +768,9 @@ function renderSwitchTable(items) {
       <td>${d.stem || ''}</td>
       <td>${d.top_housing || ''}</td>
       <td>${d.bottom_housing || ''}</td>
-      <td>${linkify(d.notes || '')}</td>
       <td>${linkify(d.testers || '')}</td>
-      <td>${linkify(d.pitfalls || '')}</td>
-    </tr>`;
+      <td>${detailsBtn}</td>
+    </tr>${detailsRow}`;
   }).join('');
   return `<div class="table-wrap"><table><thead><tr><th>${headers.join('</th><th>')}</th></tr></thead><tbody>${rows}</tbody></table></div>`;
 }
@@ -1027,6 +1087,9 @@ loadStats();
 loadKeyboards();
 loadSwitches();
 loadProposals();
+
+const savedTab = localStorage.getItem('tierlist_tab') || 'home';
+showTab(savedTab);
 
 sb.auth.onAuthStateChange((event, session) => {
   if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
