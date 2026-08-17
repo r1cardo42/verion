@@ -3,1100 +3,1048 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GD Tierlist — Главная</title>
+<title>GD Tierlist — Рейтинг девайсов</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+        colors: { accent: '#2563EB', accent2: '#0D9488' }
+      }
+    }
+  }
+</script>
 <style>
-  * { box-sizing: border-box; }
-  body {
-    font-family: system-ui, Arial, sans-serif;
-    max-width: 1500px;
-    width: 96%;
-    margin: 20px auto;
-    padding: 0 16px;
-    background: #111;
-    color: #eee;
-  }
-  h1 { font-size: 26px; margin-bottom: 0; }
-  .sub { font-size:14px; color:#888; margin-top:-4px; }
-
-  #admin-bar {
-    position: sticky;
-    top: 0;
-    background: #0a0a0a;
-    padding: 8px 12px;
-    border-bottom: 1px solid #333;
-    margin-bottom: 16px;
-    font-size: 13px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    align-items: center;
-    z-index: 10;
-  }
-  #admin-bar input {
-    width: auto;
-    padding: 4px 8px;
-    background: #222;
-    border: 1px solid #444;
-    color: #eee;
-    border-radius: 4px;
-  }
-  #admin-bar button {
-    padding: 4px 12px;
-    border-radius: 4px;
-    border: 1px solid #444;
-    background: #222;
-    color: #eee;
-    cursor: pointer;
-  }
-  #admin-bar .google-btn {
-    background: #4285F4;
-    border-color: #4285F4;
-    color: #fff;
-  }
-
-  .tabs {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    margin: 12px 0 16px;
-  }
-  .tabs button {
-    padding: 8px 18px;
-    cursor: pointer;
-    background: #222;
-    color: #eee;
-    border: 1px solid #444;
-    border-radius: 6px;
-    font-size: 14px;
-  }
-  .tabs button.active {
-    background: #3a6;
-    border-color: #3a6;
-    color: #000;
-    font-weight: bold;
-  }
-
-  .tab-content { display: none; }
-  .tab-content.active { display: block; }
-
-  .hero {
-    text-align: center;
-    padding: 20px 0 30px;
-  }
-  .hero h1 { font-size: 32px; }
-  .hero p { font-size: 18px; color: #aaa; max-width: 600px; margin: 0 auto; }
-  .stats {
-    display: flex;
-    justify-content: center;
-    gap: 40px;
-    margin: 30px 0;
-    flex-wrap: wrap;
-  }
-  .stat-item {
-    background: #1a1a1a;
-    padding: 16px 24px;
-    border-radius: 12px;
-    border: 1px solid #333;
-    min-width: 140px;
-    text-align: center;
-  }
-  .stat-item .number {
-    font-size: 36px;
-    font-weight: bold;
-    color: #3a6;
-    display: block;
-  }
-  .stat-item .label {
-    font-size: 14px;
-    color: #888;
-  }
-  .hero-actions {
-    display: flex;
-    gap: 16px;
-    justify-content: center;
-    flex-wrap: wrap;
-    margin-top: 10px;
-  }
-  .hero-actions .btn {
-    display: inline-block;
-    padding: 10px 28px;
-    background: #2a2a2a;
-    border: 1px solid #555;
-    border-radius: 30px;
-    color: #eee;
-    text-decoration: none;
-    font-size: 16px;
-    cursor: pointer;
-    transition: 0.2s;
-  }
-  .hero-actions .btn:hover {
-    background: #3a6;
-    border-color: #3a6;
-    color: #000;
-  }
-  .hero-actions .btn-primary {
-    background: #3a6;
-    border-color: #3a6;
-    color: #000;
-    font-weight: bold;
-  }
-  .hero-actions .btn-primary:hover {
-    background: #4c8;
-  }
-  .social-links {
-    margin-top: 30px;
-    display: flex;
-    gap: 20px;
-    justify-content: center;
-    font-size: 16px;
-  }
-  .social-links a {
-    color: #6af;
-    text-decoration: none;
-  }
-  .social-links a:hover { text-decoration: underline; }
-
-  .card-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    gap: 12px;
-    margin-top: 12px;
-  }
-  .card {
-    background: #1a1a1a;
-    border: 1px solid #333;
-    border-radius: 8px;
-    padding: 12px;
-  }
-  .card .tier { font-weight: bold; font-size: 18px; color: #3a6; }
-  .card .name { font-size: 16px; font-weight: bold; }
-  .card .detail { font-size: 12px; color: #aaa; margin-top: 4px; word-wrap: break-word; }
-  .card .detail a { color: #6af; text-decoration: underline; }
-
-  .table-wrap { overflow-x: auto; margin-top: 12px; }
-  .table-wrap table { width: 100%; border-collapse: collapse; font-size: 13px; table-layout: auto; }
-  .table-wrap th, .table-wrap td { border: 1px solid #333; padding: 6px 8px; text-align: left; vertical-align: top; word-break: break-word; overflow-wrap: anywhere; max-width: 220px; }
-  .table-wrap td a { color: #6af; text-decoration: underline; white-space: nowrap; }
-  .table-wrap th { background: #1c1c1c; }
-  .table-wrap tr:nth-child(even) { background: #181818; }
-
-  .proposal-item {
-    background: #1a1a1a;
-    border: 1px solid #333;
-    border-radius: 10px;
-    padding: 16px;
-    margin-bottom: 16px;
-  }
-  .proposal-item:hover { border-color: #555; }
-  .proposal-header {
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    align-items: center;
-    margin-bottom: 8px;
-  }
-  .proposal-header .title { font-weight: bold; font-size: 16px; }
-  .proposal-header .meta { font-size: 13px; color: #aaa; }
-  .proposal-fields {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 4px 16px;
-    font-size: 14px;
-    margin: 8px 0;
-    background: #111;
-    padding: 10px;
-    border-radius: 6px;
-  }
-  .proposal-fields .field { display: flex; flex-wrap: wrap; }
-  .proposal-fields .field .label { color: #888; min-width: 100px; }
-  .proposal-fields .field .value { color: #eee; word-break: break-word; }
-  .proposal-actions {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    margin-top: 10px;
-    padding-top: 8px;
-    border-top: 1px solid #2a2a2a;
-  }
-  .proposal-actions button {
-    padding: 4px 14px;
-    border-radius: 4px;
-    border: 1px solid #444;
-    background: #222;
-    color: #eee;
-    cursor: pointer;
-    font-size: 13px;
-  }
-  .proposal-actions button:hover { background: #333; }
-  .proposal-actions .delete-btn { border-color: #e55; color: #e55; }
-  .proposal-actions .delete-btn:hover { background: #e55; color: #000; }
-  .status-badge {
-    display: inline-block;
-    padding: 2px 10px;
-    border-radius: 12px;
-    font-size: 12px;
-    font-weight: bold;
-  }
-  .status-badge.pending { background: #e6c229; color: #000; }
-  .status-badge.approved { background: #3a6; color: #000; }
-  .status-badge.rejected { background: #e55; color: #fff; }
-
-  .comments { margin-top: 8px; }
-  .comment { font-size: 12px; border-top: 1px solid #2a2a2a; padding-top: 6px; margin-top: 6px; }
-
-  form {
-    background: #1a1a1a;
-    padding: 16px;
-    border-radius: 8px;
-    margin-bottom: 16px;
-  }
-  form label { display: block; margin-top: 8px; font-size: 13px; color: #aaa; }
-  form input, form textarea, form select {
-    width: 100%;
-    padding: 6px;
-    margin-top: 3px;
-    background: #222;
-    color: #eee;
-    border: 1px solid #444;
-    border-radius: 4px;
-    box-sizing: border-box;
-  }
-  form button {
-    margin-top: 12px;
-    padding: 8px 20px;
-    background: #3a6;
-    color: #000;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: bold;
-  }
-  .small { font-size: 12px; color: #888; }
-  .flex { display: flex; gap: 12px; flex-wrap: wrap; }
-  .flex label { flex: 1; min-width: 140px; }
-
-  .view-toggle {
-    display: flex;
-    gap: 4px;
-    background: #1a1a1a;
-    border-radius: 6px;
-    padding: 4px;
-    border: 1px solid #333;
-  }
-  .view-toggle button {
-    background: transparent;
-    border: none;
-    color: #888;
-    padding: 4px 12px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 14px;
-  }
-  .view-toggle button.active { background: #333; color: #fff; }
-
-  @media (max-width: 600px) {
-    .stats { gap: 16px; }
-    .stat-item { min-width: 100px; padding: 12px; }
-    .proposal-fields { grid-template-columns: 1fr; }
-    .hero h1 { font-size: 24px; }
-  }
+  body { font-family: 'Inter', system-ui, sans-serif; }
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 8px; }
+  .no-scrollbar::-webkit-scrollbar { display: none; }
 </style>
 </head>
-<body>
+<body class="bg-[#F4F4F6] text-[#111827]">
 
-<!-- Админ-панель -->
-<div id="admin-bar"></div>
+<div id="root"></div>
 
-<!-- Заголовок и вкладки -->
-<div style="display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between;">
-  <div>
-    <h1>🎹 GD Tierlist</h1>
-    <p class="sub">Клавиатуры и свитчи — рейтинг сообщества</p>
-  </div>
-  <div class="view-toggle" id="view-toggle" style="margin:8px 0;">
-    <button id="view-grid" class="active" onclick="setView('grid')">🧱 Плитка</button>
-    <button id="view-list" onclick="setView('list')">📋 Список</button>
-  </div>
-</div>
-
-<!-- Вкладки -->
-<div class="tabs">
-  <button id="tab-btn-home" class="active" onclick="showTab('home')">🏠 Главная</button>
-  <button id="tab-btn-keyboards" onclick="showTab('keyboards')">⌨️ Клавиатуры</button>
-  <button id="tab-btn-switches" onclick="showTab('switches')">🔄 Свитчи</button>
-  <button id="tab-btn-proposals" onclick="showTab('proposals')">📋 Предложения</button>
-  <button id="tab-btn-new" onclick="showTab('new')">➕ Предложить</button>
-</div>
-
-<!-- ========== ВКЛАДКА: ГЛАВНАЯ ========== -->
-<div id="tab-home" class="tab-content active">
-  <div class="hero">
-    <h1>🏆 GD Tierlist</h1>
-    <p>Самый полный и актуальный рейтинг клавиатур и свитчей для Geometry Dash, поддерживаемый сообществом.</p>
-
-    <div class="stats" id="stats-container">
-      <div class="stat-item">
-        <span class="number" id="stat-keyboards">—</span>
-        <span class="label">Клавиатур</span>
-      </div>
-      <div class="stat-item">
-        <span class="number" id="stat-switches">—</span>
-        <span class="label">Свитчей</span>
-      </div>
-      <div class="stat-item">
-        <span class="number" id="stat-proposals">—</span>
-        <span class="label">Предложений</span>
-      </div>
-    </div>
-
-    <div class="hero-actions">
-      <button class="btn btn-primary" onclick="showTab('keyboards')">⌨️ Список клавиатур</button>
-      <button class="btn btn-primary" onclick="showTab('switches')">🔄 Список свитчей</button>
-      <button class="btn" onclick="showTab('new')">➕ Предложить изменение</button>
-    </div>
-
-    <div class="social-links">
-      <a href="#" target="_blank">Discord</a>
-      <a href="#" target="_blank">Telegram</a>
-      <a href="#" target="_blank">GitHub</a>
-    </div>
-  </div>
-</div>
-
-<!-- ========== ВКЛАДКА: КЛАВИАТУРЫ ========== -->
-<div id="tab-keyboards" class="tab-content">
-  <div id="keyboards-container"><p class="small">Загрузка...</p></div>
-</div>
-
-<!-- ========== ВКЛАДКА: СВИТЧИ ========== -->
-<div id="tab-switches" class="tab-content">
-  <div id="switches-container"><p class="small">Загрузка...</p></div>
-</div>
-
-<!-- ========== ВКЛАДКА: ПРЕДЛОЖЕНИЯ ========== -->
-<div id="tab-proposals" class="tab-content">
-  <div id="proposals-list"><p class="small">Загрузка...</p></div>
-</div>
-
-<!-- ========== ВКЛАДКА: ПРЕДЛОЖИТЬ ========== -->
-<div id="tab-new" class="tab-content">
-  <div class="tabs" style="margin-bottom:16px;">
-    <button id="new-subtab-btn-keyboard" class="active" onclick="showNewSubtab('keyboard')">⌨️ Клавиатура</button>
-    <button id="new-subtab-btn-switch" onclick="showNewSubtab('switch')">🔄 Свитч</button>
-  </div>
-
-  <!-- ---- Форма: КЛАВИАТУРА ---- -->
-  <form id="proposal-form-keyboard">
-    <label>Тип предложения
-      <select id="kb-type">
-        <option value="add">Добавить новую клавиатуру</option>
-        <option value="edit">Изменить существующую</option>
-      </select>
-    </label>
-    <div id="kb-edit-target-wrap" style="display:none">
-      <label>Какую клавиатуру меняем <select id="kb-target"></select></label>
-    </div>
-    <div class="flex">
-      <label>Название <input id="kb-name" required></label>
-      <label>Тир <input id="kb-tier" placeholder="SS+, SS, S+, ..."></label>
-    </div>
-    <div class="flex">
-      <label>Формат <input id="kb-format" placeholder="60%, 65%, TKL..."></label>
-      <label>Цена <input id="kb-price"></label>
-    </div>
-    <div class="flex">
-      <label>Где купить (ссылка) <input id="kb-buy" placeholder="https://..."></label>
-      <label>Свитчи <input id="kb-switches"></label>
-    </div>
-    <div class="flex">
-      <label>Софт <input id="kb-software"></label>
-      <label>Разработчик/чип <input id="kb-dev"></label>
-    </div>
-    <div class="flex">
-      <label>Рекомендация <input id="kb-recommend" placeholder="👑 / 🌟 / ➖ / ❌ / 🤡"></label>
-      <label>Тестеры <input id="kb-testers"></label>
-    </div>
-    <label>Подводные камни <textarea id="kb-pitfalls" rows="2"></textarea></label>
-    <label>Почему стоит внести это изменение <textarea id="kb-reason" rows="2"></textarea></label>
-    <div class="flex">
-      <label>Ваш ник <input id="kb-author" placeholder="как вас подписать"></label>
-    </div>
-    <div class="flex">
-      <button type="submit">Отправить на рассмотрение</button>
-      <button type="button" onclick="resetForm('keyboard')" style="background:#333; color:#eee;">↺ Сбросить всё</button>
-    </div>
-  </form>
-
-  <!-- ---- Форма: СВИТЧ ---- -->
-  <form id="proposal-form-switch" style="display:none">
-    <label>Тип предложения
-      <select id="sw-type">
-        <option value="add">Добавить новый свитч</option>
-        <option value="edit">Изменить существующий</option>
-      </select>
-    </label>
-    <div id="sw-edit-target-wrap" style="display:none">
-      <label>Какой свитч меняем <select id="sw-target"></select></label>
-    </div>
-    <div class="flex">
-      <label>Название <input id="sw-name" required></label>
-      <label>Тир <input id="sw-tier" placeholder="SS+, SS, S+, ..."></label>
-    </div>
-    <div class="flex">
-      <label>Цена <input id="sw-price"></label>
-      <label>Где купить (ссылка) <input id="sw-buy" placeholder="https://..."></label>
-    </div>
-    <div class="flex">
-      <label>Ход свитча <input id="sw-travel" placeholder="3.5"></label>
-      <label>Сила нажатия <input id="sw-force" placeholder="35г"></label>
-    </div>
-    <div class="flex">
-      <label>Stem <input id="sw-stem" placeholder="POM"></label>
-      <label>Top housing <input id="sw-top" placeholder="PC"></label>
-    </div>
-    <div class="flex">
-      <label>Bottom housing <input id="sw-bottom" placeholder="PA66"></label>
-      <label>Рекомендация <input id="sw-recommend" placeholder="👑 / 🌟 / ➖ / ❌ / 🤡"></label>
-    </div>
-    <label>Тестеры <input id="sw-testers"></label>
-    <label>Примечание <textarea id="sw-note" rows="2"></textarea></label>
-    <label>Подводные камни <textarea id="sw-pitfalls" rows="2"></textarea></label>
-    <label>Почему стоит внести это изменение <textarea id="sw-reason" rows="2"></textarea></label>
-    <div class="flex">
-      <label>Ваш ник <input id="sw-author" placeholder="как вас подписать"></label>
-    </div>
-    <div class="flex">
-      <button type="submit">Отправить на рассмотрение</button>
-      <button type="button" onclick="resetForm('switch')" style="background:#333; color:#eee;">↺ Сбросить всё</button>
-    </div>
-  </form>
-</div>
-
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
-<script>
-// ============================================================
-//  ИНИЦИАЛИЗАЦИЯ
-// ============================================================
+
+<script type="text/babel" data-presets="react">
+const { useState, useEffect, useMemo, useRef } = React;
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+// ============================================================
+//  ИКОНКИ
+// ============================================================
+const Icon = ({ d, className = "w-4 h-4", strokeWidth = 2 }) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth}
+       strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <path d={d} />
+  </svg>
+);
+const ICONS = {
+  search: "M21 21l-4.3-4.3M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z",
+  grid: "M3 3h7v7H3V3Zm11 0h7v7h-7V3ZM3 14h7v7H3v-7Zm11 0h7v7h-7v-7Z",
+  list: "M4 6h16M4 12h16M4 18h16",
+  x: "M18 6L6 18M6 6l12 12",
+  star: "M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.77 5.82 21 7 14.14l-5-4.87 6.91-1.01L12 2Z",
+  cart: "M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.3 4.6A1 1 0 0 0 5.6 19H17M9 21a1 1 0 1 0 0-2 1 1 0 0 0 0 2Zm8 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z",
+  arrowRight: "M5 12h14M13 6l6 6-6 6",
+  keyboard: "M4 6h16v12H4V6Zm3 4h.01M11 10h.01M15 10h.01M7 14h10",
+};
 
-let currentView = localStorage.getItem('tierlist_view') || 'grid';
-let currentUser = null;
-let isAdmin = false;
+// ============================================================
+//  ТИРЫ — все реальные тиры, не только SS/S/A из брифа
+// ============================================================
+const TIER_ORDER = ['SS+', 'SS', 'S+', 'S', 'A+', 'A', 'B', 'C', 'D', 'F'];
+const TIER_STYLES = {
+  'SS+': 'bg-amber-50 text-amber-700 border-amber-200',
+  'SS':  'bg-yellow-50 text-yellow-700 border-yellow-200',
+  'S+':  'bg-emerald-50 text-emerald-700 border-emerald-200',
+  'S':   'bg-teal-50 text-teal-700 border-teal-200',
+  'A+':  'bg-blue-50 text-blue-700 border-blue-200',
+  'A':   'bg-sky-50 text-sky-700 border-sky-200',
+  'B':   'bg-slate-100 text-slate-600 border-slate-200',
+  'C':   'bg-gray-100 text-gray-500 border-gray-200',
+};
+function tierStyle(tier) {
+  const key = (tier || '').split(/[\s\-]+/)[0];
+  return TIER_STYLES[key] || 'bg-gray-100 text-gray-500 border-gray-200';
+}
+function mainTier(tier) { return (tier || '').split(/[\s\-]+/)[0]; }
+function sortByTier(items) {
+  return [...items].sort((a, b) => {
+    const ia = TIER_ORDER.indexOf(mainTier(a.tier));
+    const ib = TIER_ORDER.indexOf(mainTier(b.tier));
+    if (ia === -1 && ib === -1) return 0;
+    if (ia === -1) return 1;
+    if (ib === -1) return -1;
+    return ia - ib;
+  });
+}
 
 // ============================================================
 //  УТИЛИТЫ
 // ============================================================
+function linkify(text) {
+  if (!text) return text;
+  const parts = text.split(/(https?:\/\/[^\s]+)/g);
+  return parts.map((p, i) => /^https?:\/\//.test(p)
+    ? <a key={i} href={p} target="_blank" className="text-accent underline">{p}</a>
+    : p);
+}
+const KNOWN_LINKS = {
+  'ozon': 'https://www.ozon.ru', 'aliexpress': 'https://aliexpress.com',
+  'taobao': 'https://www.taobao.com', 'avito': 'https://www.avito.ru',
+  'авито': 'https://www.avito.ru', 'dns': 'https://www.dns-shop.ru',
+  'vgn hub': 'https://vgn.gg', 'wootility': 'https://wootility.io',
+  'atk': 'https://www.atkgear.com', 'mchose hub': 'https://mchose.com',
+};
+function resolveBuyUrl(text) {
+  if (!text) return null;
+  if (/^https?:\/\//.test(text)) return text;
+  return KNOWN_LINKS[text.trim().toLowerCase()] || null;
+}
+function siteLabel(text) {
+  if (!text) return 'магазине';
+  if (/^https?:\/\//.test(text)) {
+    try { return new URL(text).hostname.replace('www.', ''); } catch (e) { return 'магазине'; }
+  }
+  return text;
+}
 function getVoterId() {
   let id = localStorage.getItem('voter_id');
   if (!id) { id = crypto.randomUUID(); localStorage.setItem('voter_id', id); }
   return id;
 }
-
-function linkify(text) {
-  if (!text) return '';
-  return text.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank">$1</a>');
+function parsePrice(str) {
+  if (!str) return null;
+  const digits = str.replace(/[^\d]/g, '');
+  return digits ? parseInt(digits, 10) : null;
 }
 
-// Известные магазины и софт -> ссылки на их сайты.
-// Дополняй этот список своими значениями по мере надобности.
-const KNOWN_LINKS = {
-  'ozon': 'https://www.ozon.ru',
-  'aliexpress': 'https://aliexpress.com',
-  'taobao': 'https://www.taobao.com',
-  'bilibili': 'https://www.bilibili.com',
-  'goofish': 'https://www.goofish.com',
-  'авито': 'https://www.avito.ru',
-  'avito': 'https://www.avito.ru',
-  'dns': 'https://www.dns-shop.ru',
-  'offcial site': null,   // нет единого сайта — оставляем как текст
-  'official site': null,
-  'vgn hub': 'https://vgn.gg',
-  'wootility': 'https://wootility.io',
-  'atk': 'https://www.atkgear.com',
-  'mchose hub': 'https://mchose.com',
-  'aula hub': 'https://www.aulacn.com',
-  'chilkey hub': 'https://chilkey.com',
-};
+// ============================================================
+//  МЕЛКИЕ UI-ПРИМИТИВЫ
+// ============================================================
+function Pill({ active, onClick, children }) {
+  return (
+    <button onClick={onClick}
+      className={`px-3.5 py-1.5 rounded-full text-sm font-medium border transition
+        ${active ? 'bg-accent text-white border-accent' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'}`}>
+      {children}
+    </button>
+  );
+}
+function TierBadge({ tier, size = 'md' }) {
+  const sizeCls = size === 'lg' ? 'text-sm px-3 py-1' : 'text-xs px-2 py-0.5';
+  return <span className={`inline-flex items-center rounded-full border font-bold ${sizeCls} ${tierStyle(tier)}`}>{tier || '—'}</span>;
+}
+function Spec({ label, value }) {
+  if (!value) return null;
+  return (
+    <span className="inline-flex items-center gap-1 text-xs bg-gray-100 text-gray-600 rounded-full px-2.5 py-1">
+      <span className="text-gray-400">{label}:</span> {value}
+    </span>
+  );
+}
+function Stars({ rating, onRate, size = 'text-xl' }) {
+  return (
+    <div className={`flex gap-0.5 ${size}`}>
+      {[1,2,3,4,5].map(n => (
+        <span key={n} onClick={() => onRate && onRate(n)}
+          className={`${onRate ? 'cursor-pointer' : ''} ${n <= rating ? 'text-amber-400' : 'text-gray-200'}`}>★</span>
+      ))}
+    </div>
+  );
+}
 
-// Если текст (уже содержит ссылку ИЛИ совпадает с известным названием) -
-// делаем кликабельным. Иначе просто выводим текст как есть.
-function autoLink(text) {
-  if (!text) return '';
-  // если внутри уже есть http-ссылка — просто линкуем её
-  if (/https?:\/\//.test(text)) return linkify(text);
+// ============================================================
+//  МОДАЛКА-КАРКАС
+// ============================================================
+function Modal({ open, onClose, children, maxWidth = 'max-w-xl' }) {
+  if (!open) return null;
+  return (
+    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-start justify-center overflow-y-auto p-4 sm:p-8"
+         onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
+      <div className={`bg-white rounded-2xl shadow-xl w-full ${maxWidth} p-6 relative my-4`}>
+        <button onClick={onClose} className="absolute top-4 right-4 w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center">
+          <Icon d={ICONS.x} className="w-4 h-4 text-gray-500" />
+        </button>
+        {children}
+      </div>
+    </div>
+  );
+}
 
-  const key = text.trim().toLowerCase();
-  if (KNOWN_LINKS[key]) {
-    return `<a href="${KNOWN_LINKS[key]}" target="_blank">${text}</a>`;
+// ============================================================
+//  ШАПКА
+// ============================================================
+function Header({ tab, setTab, search, setSearch, user, isAdmin, onLogout, onOpenAuth }) {
+  const searchRef = useRef(null);
+  useEffect(() => {
+    function onKey(e) {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); searchRef.current && searchRef.current.focus(); }
+    }
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
+
+  const navItems = [
+    { id: 'home', label: 'Главная' },
+    { id: 'keyboards', label: 'Клавиатуры' },
+    { id: 'switches', label: 'Свитчи' },
+    { id: 'proposals', label: 'Предложения' },
+    { id: 'new', label: 'Предложить' },
+  ];
+
+  return (
+    <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-gray-100">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center gap-4 flex-wrap">
+        <div onClick={() => setTab('home')} className="flex items-center gap-2 cursor-pointer shrink-0">
+          <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center">
+            <Icon d={ICONS.keyboard} className="w-4 h-4 text-white" />
+          </div>
+          <span className="font-extrabold text-lg tracking-tight">GD Tierlist</span>
+        </div>
+
+        <nav className="hidden md:flex items-center gap-1 ml-2">
+          {navItems.map(n => (
+            <button key={n.id} onClick={() => setTab(n.id)}
+              className={`px-3 py-1.5 rounded-full text-sm font-medium transition
+                ${tab === n.id ? 'bg-gray-100 text-gray-900' : 'text-gray-500 hover:text-gray-900'}`}>
+              {n.label}
+            </button>
+          ))}
+        </nav>
+
+        <div className="flex-1 min-w-[160px] max-w-md ml-auto">
+          <div className="relative">
+            <Icon d={ICONS.search} className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <input ref={searchRef} value={search} onChange={e => setSearch(e.target.value)}
+              placeholder="Поиск..."
+              className="w-full pl-9 pr-14 py-2 rounded-full border border-gray-200 bg-gray-50 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:bg-white" />
+            <span className="hidden sm:inline absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] text-gray-400 border border-gray-200 rounded px-1.5 py-0.5 bg-white">⌘K</span>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2 shrink-0">
+          <span className="hidden lg:inline-flex items-center gap-1 text-xs text-gray-400 border border-gray-200 rounded-full px-2.5 py-1">RUB · RU</span>
+          {user ? (
+            <div className="flex items-center gap-2">
+              <span className="hidden sm:inline text-sm text-gray-500">{isAdmin ? 'Админ' : user.email}</span>
+              <button onClick={onLogout} className="text-sm px-3 py-1.5 rounded-full border border-gray-200 hover:bg-gray-50">Выйти</button>
+            </div>
+          ) : (
+            <button onClick={onOpenAuth} className="text-sm px-4 py-1.5 rounded-full bg-accent text-white font-medium hover:bg-blue-700 transition">Войти</button>
+          )}
+        </div>
+      </div>
+      <nav className="md:hidden flex gap-1 px-4 pb-2 overflow-x-auto no-scrollbar">
+        {navItems.map(n => (
+          <button key={n.id} onClick={() => setTab(n.id)}
+            className={`shrink-0 px-3 py-1.5 rounded-full text-sm font-medium ${tab === n.id ? 'bg-gray-100 text-gray-900' : 'text-gray-500'}`}>
+            {n.label}
+          </button>
+        ))}
+      </nav>
+    </header>
+  );
+}
+
+// ============================================================
+//  HERO
+// ============================================================
+function Hero({ topPick, onOpenDetails, categoryLabel }) {
+  const criteria = [
+    { label: 'Стабильность', value: 92 },
+    { label: 'Тайпинг-фидбек', value: 85 },
+    { label: 'Цена / качество', value: 78 },
+  ];
+  return (
+    <section className="max-w-7xl mx-auto px-4 sm:px-6 pt-10 pb-8 grid md:grid-cols-2 gap-10 items-start">
+      <div>
+        <p className="text-accent font-semibold text-sm mb-2">Рейтинг сообщества</p>
+        <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight leading-[1.05] mb-6">
+          Рейтинг {categoryLabel}<br/>для Geometry&nbsp;Dash
+        </h1>
+        <p className="text-gray-500 text-lg mb-8 max-w-md">
+          Составлено и поддерживается комьюнити: любой может предложить правку, финальное решение — за модераторами.
+        </p>
+        <div className="space-y-4 max-w-sm">
+          {criteria.map(c => (
+            <div key={c.label}>
+              <div className="flex justify-between text-sm mb-1">
+                <span className="text-gray-600 font-medium">{c.label}</span>
+                <span className="text-gray-400">{c.value}%</span>
+              </div>
+              <div className="h-2 rounded-full bg-gray-100 overflow-hidden">
+                <div className="h-full rounded-full bg-accent" style={{ width: c.value + '%' }} />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {topPick && (
+        <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6 relative overflow-hidden">
+          <div className="absolute top-6 right-6"><TierBadge tier={topPick.tier} size="lg" /></div>
+          <p className="text-xs font-semibold text-accent uppercase tracking-wide mb-1">Выбор редакции</p>
+          <h3 className="text-2xl font-bold mb-1">{topPick.name}</h3>
+          <p className="text-gray-400 text-sm mb-5">{topPick.developer || topPick.software || 'Топ рейтинга'}</p>
+          <div className="w-full h-40 rounded-2xl bg-gray-50 border border-dashed border-gray-200 flex items-center justify-center text-gray-300 text-sm mb-5">
+            фото устройства
+          </div>
+          <div className="flex flex-wrap gap-2 mb-5">
+            <Spec label="Формат" value={topPick.format} />
+            <Spec label="Свитчи" value={topPick.switches} />
+            {topPick.price && <Spec label="Цена" value={topPick.price} />}
+          </div>
+          <button onClick={() => onOpenDetails(topPick)}
+            className="w-full flex items-center justify-center gap-2 bg-gray-900 text-white rounded-full py-3 font-medium hover:bg-black transition">
+            Подробнее <Icon d={ICONS.arrowRight} className="w-4 h-4" />
+          </button>
+        </div>
+      )}
+    </section>
+  );
+}
+
+// ============================================================
+//  ПАНЕЛЬ ФИЛЬТРОВ
+// ============================================================
+function FilterPanel({ tiers, activeTiers, toggleTier, formats, format, setFormat,
+                        budget, setBudget, sort, setSort, view, setView, showReco, setShowReco }) {
+  return (
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 mb-6">
+      <div className="bg-white/90 backdrop-blur-md border border-gray-100 rounded-2xl shadow-sm p-4 flex flex-wrap items-center gap-3">
+        <div className="flex flex-wrap gap-1.5">
+          {tiers.map(t => (
+            <Pill key={t} active={activeTiers.includes(t)} onClick={() => toggleTier(t)}>{t}</Pill>
+          ))}
+        </div>
+
+        <div className="flex-1 min-w-[8px]" />
+
+        {formats && formats.length > 0 && (
+          <select value={format} onChange={e => setFormat(e.target.value)}
+            className="text-sm border border-gray-200 rounded-full px-3 py-1.5 bg-white text-gray-600">
+            <option value="">Формат: все</option>
+            {formats.map(f => <option key={f} value={f}>{f}</option>)}
+          </select>
+        )}
+
+        <select value={budget} onChange={e => setBudget(e.target.value)}
+          className="text-sm border border-gray-200 rounded-full px-3 py-1.5 bg-white text-gray-600">
+          <option value="">Бюджет: любой</option>
+          <option value="0-5000">до 5 000 ₽</option>
+          <option value="5000-10000">5 000 – 10 000 ₽</option>
+          <option value="10000-999999">от 10 000 ₽</option>
+        </select>
+
+        <select value={sort} onChange={e => setSort(e.target.value)}
+          className="text-sm border border-gray-200 rounded-full px-3 py-1.5 bg-white text-gray-600">
+          <option value="tier">Сортировка: по тиру</option>
+          <option value="price-asc">Цена: сначала дешевле</option>
+          <option value="price-desc">Цена: сначала дороже</option>
+          <option value="name">По алфавиту</option>
+        </select>
+
+        <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer select-none">
+          <span className={`w-9 h-5 rounded-full relative transition ${showReco ? 'bg-accent' : 'bg-gray-200'}`}
+                onClick={() => setShowReco(!showReco)}>
+            <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition ${showReco ? 'left-4.5 translate-x-0.5' : 'left-0.5'}`} />
+          </span>
+          Подсветка
+        </label>
+
+        <div className="flex gap-1 bg-gray-100 rounded-full p-1">
+          <button onClick={() => setView('grid')} className={`p-1.5 rounded-full ${view === 'grid' ? 'bg-white shadow-sm' : 'text-gray-400'}`}>
+            <Icon d={ICONS.grid} className="w-4 h-4" />
+          </button>
+          <button onClick={() => setView('list')} className={`p-1.5 rounded-full ${view === 'list' ? 'bg-white shadow-sm' : 'text-gray-400'}`}>
+            <Icon d={ICONS.list} className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+//  КАРТОЧКА ТОВАРА
+// ============================================================
+function ProductCard({ item, category, showReco, onOpen }) {
+  return (
+    <div onClick={() => onOpen(item)}
+      className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all cursor-pointer p-5 flex flex-col">
+      <div className="flex items-start justify-between mb-3">
+        <TierBadge tier={item.tier} />
+        {showReco && item.recommendation && (
+          <span className="text-xs text-amber-500 flex items-center gap-1"><Icon d={ICONS.star} className="w-3.5 h-3.5" />рекомендуют</span>
+        )}
+      </div>
+      <div className="w-full h-28 rounded-xl bg-gray-50 border border-dashed border-gray-200 flex items-center justify-center text-gray-300 text-xs mb-4">
+        фото
+      </div>
+      <h3 className="font-bold text-gray-900 mb-1 leading-snug">{item.name}</h3>
+      <p className="text-xs text-gray-400 mb-3">{category === 'switch' ? (item.developer || 'Свитч') : (item.developer || item.software || 'Клавиатура')}</p>
+      <div className="flex flex-wrap gap-1.5 mb-4">
+        {category === 'switch' ? (
+          <React.Fragment>
+            <Spec label="Ход" value={item.travel} />
+            <Spec label="Сила" value={item.force} />
+          </React.Fragment>
+        ) : (
+          <React.Fragment>
+            <Spec label="Формат" value={item.format} />
+            <Spec label="Свитчи" value={item.switches} />
+          </React.Fragment>
+        )}
+      </div>
+      <div className="mt-auto flex items-center justify-between pt-3 border-t border-gray-50">
+        <span className="font-bold text-lg">{item.price || '—'}</span>
+        <span className="text-sm text-accent font-medium flex items-center gap-1">Подробнее <Icon d={ICONS.arrowRight} className="w-3.5 h-3.5" /></span>
+      </div>
+    </div>
+  );
+}
+
+function ProductRow({ item, category, onOpen }) {
+  return (
+    <div onClick={() => onOpen(item)}
+      className="bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all cursor-pointer p-4 flex items-center gap-4">
+      <TierBadge tier={item.tier} />
+      <div className="w-14 h-14 rounded-lg bg-gray-50 border border-dashed border-gray-200 flex items-center justify-center text-gray-300 text-[10px] shrink-0">фото</div>
+      <div className="flex-1 min-w-0">
+        <h3 className="font-bold text-gray-900 truncate">{item.name}</h3>
+        <div className="flex flex-wrap gap-1.5 mt-1">
+          {category === 'switch'
+            ? (<React.Fragment><Spec label="Ход" value={item.travel} /><Spec label="Сила" value={item.force} /></React.Fragment>)
+            : (<React.Fragment><Spec label="Формат" value={item.format} /><Spec label="Свитчи" value={item.switches} /></React.Fragment>)}
+        </div>
+      </div>
+      <div className="font-bold text-lg whitespace-nowrap">{item.price || '—'}</div>
+      <Icon d={ICONS.arrowRight} className="w-4 h-4 text-gray-300 shrink-0" />
+    </div>
+  );
+}
+
+// ============================================================
+//  МОДАЛКА "ПОДРОБНЕЕ" + ОТЗЫВЫ
+// ============================================================
+function DetailsModal({ item, category, onClose }) {
+  const [reviews, setReviews] = useState([]);
+  const [rating, setRating] = useState(0);
+  const [text, setText] = useState('');
+  const [loadingReviews, setLoadingReviews] = useState(true);
+
+  const table = category === 'switch' ? 'switches' : 'devices';
+
+  useEffect(() => {
+    if (!item) return;
+    setLoadingReviews(true);
+    sb.from('reviews').select('*').eq('target_table', table).eq('target_id', item.id)
+      .order('created_at', { ascending: false })
+      .then(({ data, error }) => { setReviews(error ? [] : (data || [])); setLoadingReviews(false); });
+  }, [item]);
+
+  if (!item) return null;
+
+  const buyUrl = resolveBuyUrl(item.buy_url || item.buy_link);
+  const label = siteLabel(item.buy_url || item.buy_link);
+
+  async function submitReview() {
+    if (!rating) { alert('Поставьте оценку звёздами'); return; }
+    const { error } = await sb.from('reviews').insert({ target_table: table, target_id: item.id, rating, text });
+    if (error) { alert('Не удалось отправить отзыв: ' + error.message); return; }
+    setText(''); setRating(0);
+    const { data } = await sb.from('reviews').select('*').eq('target_table', table).eq('target_id', item.id).order('created_at', { ascending: false });
+    setReviews(data || []);
   }
-  return text;
-}
 
-function resetForm(cat) {
-  const formId = cat === 'switch' ? 'proposal-form-switch' : 'proposal-form-keyboard';
-  const wrapId = cat === 'switch' ? 'sw-edit-target-wrap' : 'kb-edit-target-wrap';
-  document.getElementById(formId).reset();
-  document.getElementById(wrapId).style.display = 'none';
-}
+  return (
+    <Modal open={!!item} onClose={onClose} maxWidth="max-w-2xl">
+      <div className="flex items-start gap-4 mb-5">
+        <TierBadge tier={item.tier} size="lg" />
+        <div className="flex-1">
+          <h2 className="text-2xl font-bold">{item.name}</h2>
+          <p className="text-gray-400 text-sm">{category === 'switch' ? 'Свитч' : 'Клавиатура'}{item.developer ? ' · ' + item.developer : ''}</p>
+        </div>
+        {item.price && <div className="text-2xl font-extrabold whitespace-nowrap">{item.price}</div>}
+      </div>
 
-function setView(view) {
-  currentView = view;
-  localStorage.setItem('tierlist_view', view);
-  document.getElementById('view-grid').classList.toggle('active', view === 'grid');
-  document.getElementById('view-list').classList.toggle('active', view === 'list');
-  if (document.getElementById('tab-keyboards').classList.contains('active')) loadKeyboards();
-  if (document.getElementById('tab-switches').classList.contains('active')) loadSwitches();
+      <div className="flex flex-wrap gap-2 py-4 border-y border-gray-100 mb-5">
+        {category === 'switch' ? (
+          <React.Fragment>
+            <Spec label="Ход" value={item.travel} />
+            <Spec label="Сила" value={item.force} />
+            <Spec label="Stem" value={item.stem} />
+            <Spec label="Top" value={item.top_housing} />
+            <Spec label="Bottom" value={item.bottom_housing} />
+          </React.Fragment>
+        ) : (
+          <React.Fragment>
+            <Spec label="Формат" value={item.format} />
+            <Spec label="Свитчи" value={item.switches} />
+            <Spec label="Софт" value={item.software} />
+          </React.Fragment>
+        )}
+      </div>
+
+      {item.notes && <p className="text-gray-700 leading-relaxed mb-3">{linkify(item.notes)}</p>}
+      {item.pitfalls && (
+        <div className="bg-red-50 text-red-700 text-sm rounded-xl p-3 mb-3">
+          <span className="font-semibold">Подводные камни: </span>{linkify(item.pitfalls)}
+        </div>
+      )}
+      {item.testers && <p className="text-sm text-gray-400 mb-4">Тестеры: {linkify(item.testers)}</p>}
+
+      {buyUrl && (
+        <a href={buyUrl} target="_blank"
+          className="flex items-center justify-center gap-2 bg-accent text-white rounded-full py-3 font-semibold hover:bg-blue-700 transition mb-2">
+          <Icon d={ICONS.cart} className="w-4 h-4" /> Купить на {label}
+        </a>
+      )}
+
+      <div className="mt-6 pt-5 border-t border-gray-100">
+        <h3 className="font-bold mb-3">Отзывы</h3>
+        <div className="bg-gray-50 rounded-xl p-4 mb-4">
+          <Stars rating={rating} onRate={setRating} />
+          <textarea value={text} onChange={e => setText(e.target.value)} rows={2}
+            placeholder="Поделитесь опытом использования..."
+            className="w-full mt-2 p-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30" />
+          <div className="flex items-center justify-between mt-2">
+            <button onClick={submitReview} className="bg-gray-900 text-white text-sm px-4 py-2 rounded-full font-medium hover:bg-black">Отправить</button>
+            <span className="text-xs text-gray-400">Имя и аккаунт не нужны · публикация сразу</span>
+          </div>
+        </div>
+        {loadingReviews ? (
+          <p className="text-sm text-gray-400">Загрузка отзывов...</p>
+        ) : reviews.length === 0 ? (
+          <p className="text-sm text-gray-400">Пока нет отзывов. Будьте первым.</p>
+        ) : (
+          <div className="space-y-3">
+            {reviews.map(r => (
+              <div key={r.id} className="border-t border-gray-100 pt-3">
+                <Stars rating={r.rating} size="text-sm" />
+                {r.text && <p className="text-sm text-gray-600 mt-1">{linkify(r.text)}</p>}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </Modal>
+  );
 }
 
 // ============================================================
-//  ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК
+//  КАТАЛОГ
 // ============================================================
-function showTab(name) {
-  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-  document.querySelectorAll('.tabs > button').forEach(el => el.classList.remove('active'));
+function CatalogPage({ category, search }) {
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [activeTiers, setActiveTiers] = useState([]);
+  const [format, setFormat] = useState('');
+  const [budget, setBudget] = useState('');
+  const [sort, setSort] = useState('tier');
+  const [view, setView] = useState('grid');
+  const [showReco, setShowReco] = useState(true);
+  const [openItem, setOpenItem] = useState(null);
 
-  const tab = document.getElementById('tab-' + name);
-  if (tab) tab.classList.add('active');
+  const table = category === 'switch' ? 'switches' : 'devices';
 
-  const btn = document.getElementById('tab-btn-' + name);
-  if (btn) btn.classList.add('active');
+  useEffect(() => {
+    setLoading(true);
+    sb.from(table).select('*').then(({ data, error }) => {
+      setItems(error ? [] : sortByTier(data || []));
+      setLoading(false);
+    });
+  }, [category]);
 
-  localStorage.setItem('tierlist_tab', name);
+  const tiersPresent = useMemo(() => {
+    const set = new Set(items.map(i => mainTier(i.tier)).filter(Boolean));
+    return TIER_ORDER.filter(t => set.has(t));
+  }, [items]);
 
-  if (name === 'home') loadStats();
-  if (name === 'keyboards') loadKeyboards();
-  if (name === 'switches') loadSwitches();
-  if (name === 'proposals') loadProposals();
-  if (name === 'new') showNewSubtab('keyboard');
-}
+  const formatsPresent = useMemo(() => {
+    if (category === 'switch') return [];
+    const set = new Set(items.map(i => i.format).filter(Boolean));
+    return [...set];
+  }, [items, category]);
 
-// ============================================================
-//  АДМИНКА + АВТОРИЗАЦИЯ
-// ============================================================
-async function refreshAdminBar() {
-  const { data: { user } } = await sb.auth.getUser();
-  currentUser = user;
-  isAdmin = false;
-  if (user) {
-    const { data: adminRow } = await sb.from('admins').select('*').eq('user_id', user.id).maybeSingle();
-    isAdmin = !!adminRow;
+  function toggleTier(t) {
+    setActiveTiers(prev => prev.includes(t) ? prev.filter(x => x !== t) : [...prev, t]);
   }
-  const bar = document.getElementById('admin-bar');
-  if (currentUser) {
-    bar.innerHTML = `
-      <span>👤 ${currentUser.email} ${isAdmin ? '🔑 админ' : '(не админ)'}</span>
-      <button onclick="logout()">Выйти</button>
-    `;
-  } else {
-    bar.innerHTML = `
-      <input id="login-email" placeholder="email" type="email" style="width:160px;">
-      <input id="login-pass" placeholder="пароль" type="password" style="width:120px;">
-      <button onclick="login()">Войти</button>
-      <button onclick="signUp()" style="background:#333;">Зарегистрироваться</button>
-      <button onclick="loginGoogle()" class="google-btn">🔑 Продолжить с Google</button>
-    `;
-  }
-  if (document.getElementById('tab-proposals').classList.contains('active')) loadProposals();
-}
 
-async function login() {
-  const email = document.getElementById('login-email').value;
-  const password = document.getElementById('login-pass').value;
-  if (!email || !password) { alert('Введите email и пароль'); return; }
-  const { error } = await sb.auth.signInWithPassword({ email, password });
-  if (error) alert('Ошибка: ' + error.message);
-  else refreshAdminBar();
-}
+  const filtered = useMemo(() => {
+    let list = items;
+    if (activeTiers.length) list = list.filter(i => activeTiers.includes(mainTier(i.tier)));
+    if (format) list = list.filter(i => i.format === format);
+    if (budget) {
+      const parts = budget.split('-').map(Number);
+      const lo = parts[0], hi = parts[1];
+      list = list.filter(i => { const p = parsePrice(i.price); return p !== null && p >= lo && p <= hi; });
+    }
+    if (search) {
+      const q = search.toLowerCase();
+      list = list.filter(i => (i.name || '').toLowerCase().includes(q));
+    }
+    if (sort === 'price-asc') list = [...list].sort((a,b) => (parsePrice(a.price)||9e9) - (parsePrice(b.price)||9e9));
+    else if (sort === 'price-desc') list = [...list].sort((a,b) => (parsePrice(b.price)||0) - (parsePrice(a.price)||0));
+    else if (sort === 'name') list = [...list].sort((a,b) => (a.name||'').localeCompare(b.name||''));
+    else list = sortByTier(list);
+    return list;
+  }, [items, activeTiers, format, budget, sort, search]);
 
-async function signUp() {
-  const email = document.getElementById('login-email').value;
-  const password = document.getElementById('login-pass').value;
-  if (!email || !password) { alert('Введите email и пароль'); return; }
-  if (password.length < 6) { alert('Пароль должен быть не короче 6 символов'); return; }
-  const { data, error } = await sb.auth.signUp({
-    email,
-    password,
-    options: { emailRedirectTo: window.location.origin + window.location.pathname }
-  });
-  if (error) { alert('Ошибка регистрации: ' + error.message); return; }
-  if (data.user && !data.session) {
-    alert('Регистрация почти готова! Проверьте почту (' + email + ') и подтвердите email по ссылке, затем нажмите "Войти".');
-  } else {
-    alert('✅ Аккаунт создан и вы вошли!');
-    refreshAdminBar();
-  }
-}
+  const topPick = items[0];
+  const categoryLabel = category === 'switch' ? 'свитчей' : 'магнитных клавиатур';
 
-async function loginGoogle() {
-  const { error } = await sb.auth.signInWithOAuth({
-    provider: 'google',
-    options: { redirectTo: window.location.origin + window.location.pathname }
-  });
-  if (error) alert('Ошибка Google: ' + error.message);
-}
-
-async function logout() {
-  await sb.auth.signOut();
-  refreshAdminBar();
+  return (
+    <div>
+      <Hero topPick={topPick} onOpenDetails={setOpenItem} categoryLabel={categoryLabel} />
+      <FilterPanel
+        tiers={tiersPresent} activeTiers={activeTiers} toggleTier={toggleTier}
+        formats={formatsPresent} format={format} setFormat={setFormat}
+        budget={budget} setBudget={setBudget}
+        sort={sort} setSort={setSort}
+        view={view} setView={setView}
+        showReco={showReco} setShowReco={setShowReco}
+      />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-16">
+        {loading ? (
+          <p className="text-gray-400 text-center py-16">Загрузка...</p>
+        ) : filtered.length === 0 ? (
+          <p className="text-gray-400 text-center py-16">Ничего не найдено.</p>
+        ) : view === 'grid' ? (
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {filtered.map(i => <ProductCard key={i.id} item={i} category={category} showReco={showReco} onOpen={setOpenItem} />)}
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {filtered.map(i => <ProductRow key={i.id} item={i} category={category} onOpen={setOpenItem} />)}
+          </div>
+        )}
+      </div>
+      <DetailsModal item={openItem} category={category} onClose={() => setOpenItem(null)} />
+    </div>
+  );
 }
 
 // ============================================================
-//  СТАТИСТИКА
+//  ГЛАВНАЯ
 // ============================================================
-async function loadStats() {
-  try {
-    const [{ count: keyboards }, { count: switches }, { count: proposals }] = await Promise.all([
+function HomePage({ setTab }) {
+  const [stats, setStats] = useState({ keyboards: 0, switches: 0, proposals: 0 });
+  useEffect(() => {
+    Promise.all([
       sb.from('devices').select('*', { count: 'exact', head: true }),
       sb.from('switches').select('*', { count: 'exact', head: true }),
-      sb.from('proposals').select('*', { count: 'exact', head: true })
-    ]);
-    document.getElementById('stat-keyboards').textContent = keyboards || 0;
-    document.getElementById('stat-switches').textContent = switches || 0;
-    document.getElementById('stat-proposals').textContent = proposals || 0;
-  } catch (e) {
-    console.warn('Не удалось загрузить статистику', e);
-  }
-}
-
-// ============================================================
-//  СОРТИРОВКА ПО ТИРАМ
-// ============================================================
-const tierOrder = ['SS+', 'SS', 'S+', 'S', 'A+', 'A', 'B', 'C', 'D', 'F'];
-function sortByTier(items) {
-  return items.sort((a, b) => {
-    const getMainTier = (tier) => {
-      if (!tier) return '';
-      const parts = tier.split(/[\s\-]+/);
-      return parts[0];
-    };
-    const tierA = getMainTier(a.tier);
-    const tierB = getMainTier(b.tier);
-    const indexA = tierOrder.indexOf(tierA);
-    const indexB = tierOrder.indexOf(tierB);
-    if (indexA === -1 && indexB === -1) return 0;
-    if (indexA === -1) return 1;
-    if (indexB === -1) return -1;
-    return indexA - indexB;
-  });
-}
-
-// ============================================================
-//  РЕНДЕРИНГ (карточки и таблица)
-// ============================================================
-function toggleDetails(id) {
-  const el = document.getElementById('details-' + id);
-  if (!el) return;
-  const btn = document.getElementById('details-btn-' + id);
-  const isOpen = el.style.display === 'block';
-  el.style.display = isOpen ? 'none' : 'block';
-  if (btn) btn.textContent = isOpen ? '📖 Подробнее' : '📖 Скрыть';
-}
-
-function renderCardGrid(items) {
-  if (!items || items.length === 0) return '<p class="small">Нет данных.</p>';
-  return `<div class="card-grid">${items.map(d => {
-    const hasDetails = d.notes || d.pitfalls;
-    return `
-    <div class="card">
-      <div class="tier">${d.tier || '?'}</div>
-      <div class="name">${d.name || 'без названия'}</div>
-      ${d.format ? `<div class="detail">📐 ${d.format}</div>` : ''}
-      ${d.price ? `<div class="detail">💰 ${d.price}</div>` : ''}
-      ${d.recommendation ? `<div class="detail">⭐ ${d.recommendation}</div>` : ''}
-      ${d.travel || d.force ? `<div class="detail">${d.travel || ''} ${d.force || ''}</div>` : ''}
-      ${d.testers ? `<div class="detail">👥 ${linkify(d.testers)}</div>` : ''}
-      ${d.buy_url || d.buy_link ? `<div class="detail">🛒 ${autoLink(d.buy_url || d.buy_link)}</div>` : ''}
-      ${d.software ? `<div class="detail">💻 ${autoLink(d.software)}</div>` : ''}
-      ${hasDetails ? `
-        <button id="details-btn-${d.id}" type="button" onclick="toggleDetails('${d.id}')" style="margin-top:8px; padding:4px 10px; font-size:12px; background:#222; border:1px solid #444; color:#eee; border-radius:4px; cursor:pointer;">📖 Подробнее</button>
-        <div id="details-${d.id}" style="display:none; margin-top:6px;">
-          ${d.notes ? `<div class="detail">📝 ${linkify(d.notes)}</div>` : ''}
-          ${d.pitfalls ? `<div class="detail" style="color:#e55;">⚠️ ${linkify(d.pitfalls)}</div>` : ''}
-        </div>
-      ` : ''}
+      sb.from('proposals').select('*', { count: 'exact', head: true }),
+    ]).then(([k, s, p]) => setStats({ keyboards: k.count || 0, switches: s.count || 0, proposals: p.count || 0 }));
+  }, []);
+  return (
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-16 text-center">
+      <p className="text-accent font-semibold mb-2">Каталог и рейтинг девайсов</p>
+      <h1 className="text-5xl font-extrabold tracking-tight mb-4">GD Tierlist</h1>
+      <p className="text-gray-500 text-lg max-w-xl mx-auto mb-10">
+        Самый полный рейтинг клавиатур и свитчей для Geometry Dash, поддерживаемый сообществом.
+      </p>
+      <div className="flex justify-center gap-6 mb-10 flex-wrap">
+        {[['Клавиатур', stats.keyboards], ['Свитчей', stats.switches], ['Предложений', stats.proposals]].map(function(pair) {
+          const l = pair[0], v = pair[1];
+          return (
+            <div key={l} className="bg-white rounded-2xl border border-gray-100 shadow-sm px-8 py-5">
+              <div className="text-3xl font-extrabold text-accent">{v}</div>
+              <div className="text-sm text-gray-400 mt-1">{l}</div>
+            </div>
+          );
+        })}
+      </div>
+      <div className="flex justify-center gap-3 flex-wrap">
+        <button onClick={() => setTab('keyboards')} className="px-6 py-3 rounded-full bg-accent text-white font-medium hover:bg-blue-700">Список клавиатур</button>
+        <button onClick={() => setTab('switches')} className="px-6 py-3 rounded-full bg-gray-900 text-white font-medium hover:bg-black">Список свитчей</button>
+        <button onClick={() => setTab('new')} className="px-6 py-3 rounded-full border border-gray-200 font-medium hover:bg-gray-50">Предложить изменение</button>
+      </div>
     </div>
-  `;
-  }).join('')}</div>`;
-}
-
-function renderTable(items) {
-  if (!items || items.length === 0) return '<p class="small">Нет данных.</p>';
-  const headers = ['Тир', 'Название', 'Формат', 'Цена', 'Рекомендация', 'Где купить', 'Свитчи', 'Софт', 'Разработчик', 'Тестеры', 'Инфо'];
-  const rows = items.map(d => {
-    const buy = d.buy_url || d.buy_link || '';
-    const hasDetails = d.pitfalls;
-    const detailsBtn = hasDetails ? `<button id="details-btn-${d.id}" type="button" onclick="toggleDetails('${d.id}')" style="padding:3px 10px; font-size:12px; background:#222; border:1px solid #444; color:#eee; border-radius:4px; cursor:pointer;">📖 Подробнее</button>` : '';
-    const detailsRow = hasDetails ? `<tr id="details-${d.id}" style="display:none;"><td colspan="${headers.length}" style="background:#151515;">${d.pitfalls ? `<div style="color:#e55;">⚠️ ${linkify(d.pitfalls)}</div>` : ''}</td></tr>` : '';
-    return `<tr>
-      <td>${d.tier || ''}</td>
-      <td>${d.name || ''}</td>
-      <td>${d.format || ''}</td>
-      <td>${d.price || ''}</td>
-      <td>${d.recommendation || ''}</td>
-      <td>${autoLink(buy)}</td>
-      <td>${d.switches || ''}</td>
-      <td>${autoLink(d.software || '')}</td>
-      <td>${d.developer || ''}</td>
-      <td>${linkify(d.testers || '')}</td>
-      <td>${detailsBtn}</td>
-    </tr>${detailsRow}`;
-  }).join('');
-  return `<div class="table-wrap"><table><thead><tr><th>${headers.join('</th><th>')}</th></tr></thead><tbody>${rows}</tbody></table></div>`;
-}
-
-function renderSwitchTable(items) {
-  if (!items || items.length === 0) return '<p class="small">Нет данных.</p>';
-  const headers = ['Тир', 'Название', 'Цена', 'Рекомендация', 'Где купить', 'Ход', 'Сила', 'Stem', 'Top', 'Bottom', 'Тестеры', 'Инфо'];
-  const rows = items.map(d => {
-    const buy = d.buy_url || d.buy_link || '';
-    const hasDetails = d.notes || d.pitfalls;
-    const detailsBtn = hasDetails ? `<button id="details-btn-${d.id}" type="button" onclick="toggleDetails('${d.id}')" style="padding:3px 10px; font-size:12px; background:#222; border:1px solid #444; color:#eee; border-radius:4px; cursor:pointer;">📖 Подробнее</button>` : '';
-    const detailsRow = hasDetails ? `<tr id="details-${d.id}" style="display:none;"><td colspan="${headers.length}" style="background:#151515;">
-      ${d.notes ? `<div>📝 ${linkify(d.notes)}</div>` : ''}
-      ${d.pitfalls ? `<div style="color:#e55; margin-top:4px;">⚠️ ${linkify(d.pitfalls)}</div>` : ''}
-    </td></tr>` : '';
-    return `<tr>
-      <td>${d.tier || ''}</td>
-      <td>${d.name || ''}</td>
-      <td>${d.price || ''}</td>
-      <td>${d.recommendation || d.recommend || ''}</td>
-      <td>${autoLink(buy)}</td>
-      <td>${d.travel || ''}</td>
-      <td>${d.force || ''}</td>
-      <td>${d.stem || ''}</td>
-      <td>${d.top_housing || ''}</td>
-      <td>${d.bottom_housing || ''}</td>
-      <td>${linkify(d.testers || '')}</td>
-      <td>${detailsBtn}</td>
-    </tr>${detailsRow}`;
-  }).join('');
-  return `<div class="table-wrap"><table><thead><tr><th>${headers.join('</th><th>')}</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+  );
 }
 
 // ============================================================
-//  ЗАГРУЗКА КЛАВИАТУР (ТАБЛИЦА devices)
+//  ПРЕДЛОЖЕНИЯ
 // ============================================================
-async function loadKeyboards() {
-  const container = document.getElementById('keyboards-container');
-  const { data, error } = await sb.from('devices').select('*');
-  if (error) { container.innerHTML = `<p class="small">Ошибка: ${error.message}</p>`; return; }
-  if (!data || data.length === 0) { container.innerHTML = `<p class="small">Нет данных. Добавьте клавиатуры через импорт или предложения.</p>`; return; }
-  const sorted = sortByTier(data);
-  container.innerHTML = currentView === 'grid' ? renderCardGrid(sorted) : renderTable(sorted);
-}
+function ProposalCard({ p, isAdmin, currentUser, onChanged }) {
+  const [likes, setLikes] = useState(0);
+  const [comments, setComments] = useState([]);
+  const [commentText, setCommentText] = useState('');
+  const [commentAuthor, setCommentAuthor] = useState('');
 
-// ============================================================
-//  ЗАГРУЗКА СВИТЧЕЙ (ТАБЛИЦА switches)
-// ============================================================
-async function loadSwitches() {
-  const container = document.getElementById('switches-container');
-  const { data, error } = await sb.from('switches').select('*');
-  if (error) { container.innerHTML = `<p class="small">Ошибка: ${error.message}</p>`; return; }
-  if (!data || data.length === 0) { container.innerHTML = `<p class="small">Нет данных. Добавьте свитчи через импорт или предложения.</p>`; return; }
-  const sorted = sortByTier(data);
-  container.innerHTML = currentView === 'grid' ? renderCardGrid(sorted) : renderSwitchTable(sorted);
-}
+  async function loadExtra() {
+    const likesRes = await sb.from('proposal_likes').select('id').eq('proposal_id', p.id);
+    const commentsRes = await sb.from('proposal_comments').select('*').eq('proposal_id', p.id).order('created_at', { ascending: true });
+    setLikes(likesRes.data ? likesRes.data.length : 0);
+    setComments(commentsRes.data || []);
+  }
+  useEffect(() => { loadExtra(); }, [p.id]);
 
-// ============================================================
-//  ПРЕДЛОЖЕНИЯ (полные плашки)
-// ============================================================
-async function loadProposals() {
-  const container = document.getElementById('proposals-list');
-  const { data: proposals, error } = await sb
-    .from('proposals')
-    .select('*')
-    .order('created_at', { ascending: false });
-
-  if (error) { container.innerHTML = `<p class="small">Ошибка: ${error.message}</p>`; return; }
-  if (!proposals || proposals.length === 0) {
-    container.innerHTML = `<p class="small">Пока нет предложений. Будьте первым!</p>`;
-    return;
+  async function like() {
+    const { error } = await sb.from('proposal_likes').insert({ proposal_id: p.id, voter_id: getVoterId() });
+    if (error && !error.message.includes('duplicate')) alert(error.message);
+    loadExtra();
+  }
+  async function addComment(e) {
+    e.preventDefault();
+    if (!commentText.trim()) return;
+    await sb.from('proposal_comments').insert({ proposal_id: p.id, author_name: commentAuthor, text: commentText });
+    setCommentText(''); setCommentAuthor('');
+    loadExtra();
+  }
+  async function resolve(status) {
+    if (status === 'approved') {
+      const payload = p.payload || {};
+      const targetTable = p.category === 'switch' ? 'switches' : 'devices';
+      if (p.type === 'add') {
+        await sb.from(targetTable).insert(
+          p.category === 'switch'
+            ? { name: payload.name, tier: payload.tier, price: payload.price, buy_url: payload.buy_url, recommend: payload.recommend, travel: payload.travel, force: payload.force, stem: payload.stem, top_housing: payload.top_housing, bottom_housing: payload.bottom_housing, notes: payload.notes, testers: payload.testers, pitfalls: payload.pitfalls }
+            : { name: payload.name, tier: payload.tier, format: payload.format, price: payload.price, buy_url: payload.buy_url, switches: payload.switches, software: payload.software, developer: payload.developer, pitfalls: payload.pitfalls, testers: payload.testers, recommendation: payload.recommend }
+        );
+      } else {
+        const updateData = Object.assign({}, payload);
+        delete updateData.name;
+        if (p.category !== 'switch') delete updateData.format;
+        Object.keys(updateData).forEach(function(k) { if (!updateData[k]) delete updateData[k]; });
+        if (p.target_device_id && Object.keys(updateData).length) {
+          await sb.from(targetTable).update(updateData).eq('id', p.target_device_id);
+        }
+      }
+    }
+    await sb.from('proposals').update({ status: status, resolved_at: new Date().toISOString(), resolved_by: currentUser ? currentUser.email : null }).eq('id', p.id);
+    onChanged();
+  }
+  async function del() {
+    if (!confirm('Удалить это предложение навсегда?')) return;
+    const { error } = await sb.from('proposals').delete().eq('id', p.id);
+    if (error) { alert('Ошибка удаления: ' + error.message); return; }
+    onChanged();
   }
 
-  container.innerHTML = '';
-  for (const p of proposals) {
-    const [{ data: likes }, { data: comments }] = await Promise.all([
-      sb.from('proposal_likes').select('id').eq('proposal_id', p.id),
-      sb.from('proposal_comments').select('*').eq('proposal_id', p.id).order('created_at', { ascending: true })
-    ]);
+  const payload = p.payload || {};
+  const fields = [
+    ['Название', payload.name], ['Тир', payload.tier], ['Формат', payload.format], ['Цена', payload.price],
+    ['Где купить', payload.buy_url], ['Свитчи', payload.switches], ['Софт', payload.software],
+    ['Разработчик', payload.developer], ['Ход/сила', [payload.travel, payload.force].filter(Boolean).join(' ')],
+    ['Stem/Top/Bottom', [payload.stem, payload.top_housing, payload.bottom_housing].filter(Boolean).join(' / ')],
+    ['Тестеры', payload.testers], ['Примечание', payload.notes], ['Подводные камни', payload.pitfalls],
+  ].filter(function(pair) { return pair[1]; });
 
-    const div = document.createElement('div');
-    div.className = 'proposal-item';
+  const statusStyles = { pending: 'bg-amber-100 text-amber-700', approved: 'bg-emerald-100 text-emerald-700', rejected: 'bg-red-100 text-red-700' };
+  const statusLabels = { pending: 'На рассмотрении', approved: 'Одобрено', rejected: 'Отклонено' };
 
-    const categoryLabel = p.category === 'switch' ? '🔄 Свитч' : '⌨️ Клавиатура';
-    const typeLabel = p.type === 'add' ? '➕ Новое' : '✏️ Изменение';
-    const statusClass = p.status;
-    const statusLabel = p.status === 'pending' ? '⏳ На рассмотрении' : p.status === 'approved' ? '✅ Одобрено' : '❌ Отклонено';
-
-    const payload = p.payload || {};
-    const fields = [
-      { label: 'Название', value: payload.name },
-      { label: 'Тир', value: payload.tier },
-      { label: 'Формат', value: payload.format },
-      { label: 'Цена', value: payload.price },
-      { label: 'Где купить', value: payload.buy_url || payload.buy_link },
-      { label: 'Свитчи', value: payload.switches },
-      { label: 'Софт', value: payload.software },
-      { label: 'Разработчик/чип', value: payload.developer },
-      { label: 'Рекомендация', value: payload.recommend },
-      { label: 'Ход/сила', value: payload.travel || payload.force ? `${payload.travel || ''} ${payload.force || ''}` : '' },
-      { label: 'Стем/верх/низ', value: payload.stem || payload.top_housing || payload.bottom_housing ? [payload.stem, payload.top_housing, payload.bottom_housing].filter(Boolean).join(', ') : '' },
-      { label: 'Тестеры', value: payload.testers },
-      { label: 'Примечание', value: payload.notes },
-      { label: 'Подводные камни', value: payload.pitfalls },
-    ].filter(f => f.value);
-
-    let fieldsHtml = fields.map(f => {
-      const isLinkableField = f.label === 'Где купить' || f.label === 'Софт';
-      const val = isLinkableField ? autoLink(f.value) : linkify(f.value);
-      return `<div class="field"><span class="label">${f.label}:</span> <span class="value">${val}</span></div>`;
-    }).join('');
-
-    div.innerHTML = `
-      <div class="proposal-header">
-        <span class="title">${categoryLabel} — ${typeLabel}</span>
-        <span class="meta">
-          от ${p.author_name || 'аноним'} · ${new Date(p.created_at).toLocaleString('ru')}
-          <span class="status-badge ${statusClass}">${statusLabel}</span>
-        </span>
+  return (
+    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 mb-4">
+      <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
+        <div className="font-bold">{p.category === 'switch' ? 'Свитч' : 'Клавиатура'} — {p.type === 'add' ? 'новое' : 'изменение'}</div>
+        <div className="flex items-center gap-2 text-sm text-gray-400">
+          <span>{p.author_name || 'аноним'} · {new Date(p.created_at).toLocaleString('ru')}</span>
+          <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${statusStyles[p.status]}`}>{statusLabels[p.status]}</span>
+        </div>
       </div>
-      ${p.reason ? `<div style="color:#aaa; font-size:13px; margin-bottom:6px;">💬 Причина: ${p.reason}</div>` : ''}
-      <div class="proposal-fields">${fieldsHtml}</div>
-      <div class="proposal-actions">
-        <button onclick="likeProposal('${p.id}')">👍 ${likes ? likes.length : 0}</button>
-        <span class="small">💬 ${comments ? comments.length : 0}</span>
-        ${isAdmin && p.status === 'pending' ? `
-          <button onclick="resolveProposal('${p.id}', 'approved')" style="border-color:#3a6;">✅ Принять</button>
-          <button onclick="resolveProposal('${p.id}', 'rejected')" style="border-color:#e55;">❌ Отклонить</button>
-        ` : ''}
-        ${isAdmin ? `<button onclick="deleteProposal('${p.id}')" class="delete-btn">🗑️ Удалить</button>` : ''}
+      {p.reason && <p className="text-sm text-gray-500 mb-3">Причина: {p.reason}</p>}
+      <div className="grid sm:grid-cols-2 gap-x-6 gap-y-1 bg-gray-50 rounded-xl p-3 text-sm mb-3">
+        {fields.map(function(pair) {
+          return <div key={pair[0]}><span className="text-gray-400">{pair[0]}:</span> {pair[1]}</div>;
+        })}
       </div>
-      <div class="comments">
-        ${(comments || []).map(c => `<div class="comment"><b>${c.author_name || 'аноним'}:</b> ${c.text}</div>`).join('')}
+      <div className="flex flex-wrap items-center gap-2 pt-3 border-t border-gray-100">
+        <button onClick={like} className="text-sm px-3 py-1.5 rounded-full border border-gray-200 hover:bg-gray-50">Нравится ({likes})</button>
+        <span className="text-sm text-gray-400">Комментариев: {comments.length}</span>
+        {isAdmin && p.status === 'pending' && (
+          <React.Fragment>
+            <button onClick={() => resolve('approved')} className="text-sm px-3 py-1.5 rounded-full bg-emerald-500 text-white hover:bg-emerald-600">Принять</button>
+            <button onClick={() => resolve('rejected')} className="text-sm px-3 py-1.5 rounded-full bg-red-500 text-white hover:bg-red-600">Отклонить</button>
+          </React.Fragment>
+        )}
+        {isAdmin && <button onClick={del} className="text-sm px-3 py-1.5 rounded-full border border-red-200 text-red-500 hover:bg-red-50">Удалить</button>}
       </div>
-      <form onsubmit="return addComment(event, '${p.id}')" style="margin-top:8px; background:transparent; padding:0;">
-        <input placeholder="Ваш ник" class="c-author" style="width:120px; display:inline-block; background:#222; border:1px solid #444; color:#eee; padding:4px 8px; border-radius:4px;">
-        <input placeholder="Комментарий" class="c-text" style="width:calc(100% - 260px); display:inline-block; background:#222; border:1px solid #444; color:#eee; padding:4px 8px; border-radius:4px;" required>
-        <button type="submit" style="display:inline-block; width:auto; padding:4px 12px;">Отправить</button>
+      <div className="mt-3 space-y-1.5">
+        {comments.map(c => <div key={c.id} className="text-sm text-gray-600"><b>{c.author_name || 'аноним'}:</b> {c.text}</div>)}
+      </div>
+      <form onSubmit={addComment} className="flex gap-2 mt-2">
+        <input value={commentAuthor} onChange={e => setCommentAuthor(e.target.value)} placeholder="Ник" className="w-24 text-sm px-2.5 py-1.5 rounded-lg border border-gray-200" />
+        <input value={commentText} onChange={e => setCommentText(e.target.value)} placeholder="Комментарий" required className="flex-1 text-sm px-2.5 py-1.5 rounded-lg border border-gray-200" />
+        <button type="submit" className="text-sm px-3 py-1.5 rounded-lg bg-gray-900 text-white">Отправить</button>
       </form>
-    `;
-    container.appendChild(div);
+    </div>
+  );
+}
+
+function ProposalsPage({ isAdmin, currentUser }) {
+  const [proposals, setProposals] = useState([]);
+  const [loading, setLoading] = useState(true);
+  async function load() {
+    setLoading(true);
+    const { data, error } = await sb.from('proposals').select('*').order('created_at', { ascending: false });
+    setProposals(error ? [] : (data || []));
+    setLoading(false);
   }
+  useEffect(() => { load(); }, []);
+  return (
+    <div className="max-w-3xl mx-auto px-4 sm:px-6 py-10">
+      <h2 className="text-2xl font-bold mb-6">Предложения</h2>
+      {loading ? <p className="text-gray-400">Загрузка...</p>
+        : proposals.length === 0 ? <p className="text-gray-400">Пока нет предложений. Будьте первым.</p>
+        : proposals.map(p => <ProposalCard key={p.id} p={p} isAdmin={isAdmin} currentUser={currentUser} onChanged={load} />)}
+    </div>
+  );
 }
 
 // ============================================================
-//  ДЕЙСТВИЯ С ПРЕДЛОЖЕНИЯМИ
+//  ФОРМА ПРЕДЛОЖЕНИЯ
 // ============================================================
-async function likeProposal(id) {
-  const voter_id = getVoterId();
-  const { error } = await sb.from('proposal_likes').insert({ proposal_id: id, voter_id });
-  if (error && !error.message.includes('duplicate')) alert(error.message);
-  loadProposals();
+function FieldRow({ children }) { return <div className="grid sm:grid-cols-2 gap-3">{children}</div>; }
+function Field({ label, children }) {
+  return <label className="block text-sm text-gray-500 mt-3">{label}{children}</label>;
+}
+const inputCls = "w-full mt-1 px-3 py-2 rounded-lg border border-gray-200 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-accent/30";
+
+function ProposeForm({ category, currentUser, onSubmitted }) {
+  const isSwitch = category === 'switch';
+  const [type, setType] = useState('add');
+  const [targets, setTargets] = useState([]);
+  const [targetId, setTargetId] = useState('');
+  const [form, setForm] = useState({});
+  const set = (k) => (e) => setForm(f => Object.assign({}, f, { [k]: e.target.value }));
+
+  useEffect(() => { setType('add'); setForm({}); setTargetId(''); }, [category]);
+
+  useEffect(() => {
+    if (type !== 'edit') return;
+    sb.from(isSwitch ? 'switches' : 'devices').select('id,name').order('name').then(({ data }) => setTargets(data || []));
+  }, [type, category]);
+
+  async function submit(e) {
+    e.preventDefault();
+    if (type === 'add' && !form.name) { alert('Укажите название'); return; }
+    if (type === 'edit' && !targetId) { alert('Выберите, что меняем'); return; }
+
+    const payload = Object.assign({}, form);
+    if (type === 'edit') { delete payload.name; if (!isSwitch) delete payload.format; }
+
+    const { error } = await sb.from('proposals').insert({
+      type: type, category: category, target_device_id: type === 'edit' ? targetId : null,
+      target_table: isSwitch ? 'switches' : 'devices', payload: payload,
+      reason: form.reason, author_name: form.author, status: 'pending'
+    });
+    if (error) { alert('Ошибка: ' + error.message); return; }
+    alert('Предложение отправлено!');
+    setForm({}); setType('add'); setTargetId('');
+    onSubmitted();
+  }
+
+  return (
+    <form onSubmit={submit} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+      <Field label="Тип предложения">
+        <select value={type} onChange={e => setType(e.target.value)} className={inputCls}>
+          <option value="add">Добавить новое</option>
+          <option value="edit">Изменить существующее</option>
+        </select>
+      </Field>
+
+      {type === 'edit' && (
+        <Field label={isSwitch ? 'Какой свитч меняем' : 'Какую клавиатуру меняем'}>
+          <select value={targetId} onChange={e => setTargetId(e.target.value)} className={inputCls}>
+            <option value="">Выберите...</option>
+            {targets.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
+          </select>
+        </Field>
+      )}
+
+      {type === 'add' && (
+        <FieldRow>
+          <Field label="Название"><input value={form.name || ''} onChange={set('name')} className={inputCls} /></Field>
+          {!isSwitch && <Field label="Формат"><input value={form.format || ''} onChange={set('format')} placeholder="60%, 65%, TKL..." className={inputCls} /></Field>}
+        </FieldRow>
+      )}
+
+      <FieldRow>
+        <Field label="Тир"><input value={form.tier || ''} onChange={set('tier')} placeholder="SS+, SS, S+, ..." className={inputCls} /></Field>
+        <Field label="Цена"><input value={form.price || ''} onChange={set('price')} className={inputCls} /></Field>
+      </FieldRow>
+
+      <FieldRow>
+        <Field label="Где купить (ссылка)"><input value={form.buy_url || ''} onChange={set('buy_url')} placeholder="https://..." className={inputCls} /></Field>
+        {isSwitch ? (
+          <Field label="Ход свитча"><input value={form.travel || ''} onChange={set('travel')} placeholder="3.5" className={inputCls} /></Field>
+        ) : (
+          <Field label="Свитчи"><input value={form.switches || ''} onChange={set('switches')} className={inputCls} /></Field>
+        )}
+      </FieldRow>
+
+      {isSwitch ? (
+        <React.Fragment>
+          <FieldRow>
+            <Field label="Сила нажатия"><input value={form.force || ''} onChange={set('force')} placeholder="35г" className={inputCls} /></Field>
+            <Field label="Stem"><input value={form.stem || ''} onChange={set('stem')} placeholder="POM" className={inputCls} /></Field>
+          </FieldRow>
+          <FieldRow>
+            <Field label="Top housing"><input value={form.top_housing || ''} onChange={set('top_housing')} className={inputCls} /></Field>
+            <Field label="Bottom housing"><input value={form.bottom_housing || ''} onChange={set('bottom_housing')} className={inputCls} /></Field>
+          </FieldRow>
+          <Field label="Примечание"><textarea rows={2} value={form.notes || ''} onChange={set('notes')} className={inputCls} /></Field>
+        </React.Fragment>
+      ) : (
+        <FieldRow>
+          <Field label="Софт"><input value={form.software || ''} onChange={set('software')} className={inputCls} /></Field>
+          <Field label="Разработчик/чип"><input value={form.developer || ''} onChange={set('developer')} className={inputCls} /></Field>
+        </FieldRow>
+      )}
+
+      <Field label="Тестеры"><input value={form.testers || ''} onChange={set('testers')} className={inputCls} /></Field>
+      <Field label="Подводные камни"><textarea rows={2} value={form.pitfalls || ''} onChange={set('pitfalls')} className={inputCls} /></Field>
+      <Field label="Почему стоит внести это изменение"><textarea rows={2} value={form.reason || ''} onChange={set('reason')} className={inputCls} /></Field>
+      <Field label="Ваш ник"><input value={form.author || ''} onChange={set('author')} className={inputCls} /></Field>
+
+      <div className="flex gap-3 mt-5">
+        <button type="submit" className="px-5 py-2.5 rounded-full bg-accent text-white font-medium hover:bg-blue-700">Отправить на рассмотрение</button>
+        <button type="button" onClick={() => { setForm({}); setType('add'); setTargetId(''); }}
+          className="px-5 py-2.5 rounded-full border border-gray-200 font-medium hover:bg-gray-50">Сбросить всё</button>
+      </div>
+    </form>
+  );
 }
 
-async function addComment(e, proposalId) {
-  e.preventDefault();
-  const form = e.target;
-  const author_name = form.querySelector('.c-author').value;
-  const text = form.querySelector('.c-text').value;
-  await sb.from('proposal_comments').insert({ proposal_id: proposalId, author_name, text });
-  loadProposals();
-  return false;
+function NewProposalPage({ currentUser, onSubmitted }) {
+  const [cat, setCat] = useState('keyboard');
+  return (
+    <div className="max-w-2xl mx-auto px-4 sm:px-6 py-10">
+      <h2 className="text-2xl font-bold mb-6">Предложить изменение</h2>
+      <div className="flex gap-2 mb-5">
+        <Pill active={cat === 'keyboard'} onClick={() => setCat('keyboard')}>Клавиатура</Pill>
+        <Pill active={cat === 'switch'} onClick={() => setCat('switch')}>Свитч</Pill>
+      </div>
+      <ProposeForm key={cat} category={cat} currentUser={currentUser} onSubmitted={onSubmitted} />
+    </div>
+  );
 }
 
-async function resolveProposal(id, status) {
-  const { data: proposal } = await sb.from('proposals').select('*').eq('id', id).single();
-  if (!proposal) return;
+// ============================================================
+//  АВТОРИЗАЦИЯ
+// ============================================================
+function AuthModal({ open, onClose, onAuthed }) {
+  const [mode, setMode] = useState('login');
+  const [nick, setNick] = useState('');
+  const [email, setEmail] = useState('');
+  const [pass, setPass] = useState('');
 
-  if (status === 'approved') {
-    const payload = proposal.payload || {};
-    if (proposal.category === 'switch') {
-      await sb.from('switches').insert({
-        name: payload.name,
-        tier: payload.tier,
-        price: payload.price,
-        buy_url: payload.buy_url,
-        recommend: payload.recommend,
-        travel: payload.travel,
-        force: payload.force,
-        stem: payload.stem,
-        top_housing: payload.top_housing,
-        bottom_housing: payload.bottom_housing,
-        notes: payload.notes,
-        testers: payload.testers,
-        pitfalls: payload.pitfalls
-      });
+  async function submit() {
+    if (mode === 'login') {
+      if (!email || !pass) { alert('Введите email и пароль'); return; }
+      const { error } = await sb.auth.signInWithPassword({ email, password: pass });
+      if (error) { alert('Ошибка: ' + error.message); return; }
+      onAuthed(); onClose();
     } else {
-      await sb.from('devices').insert({
-        name: payload.name,
-        tier: payload.tier,
-        format: payload.format,
-        price: payload.price,
-        buy_url: payload.buy_url,
-        switches: payload.switches,
-        software: payload.software,
-        developer: payload.developer,
-        pitfalls: payload.pitfalls,
-        testers: payload.testers,
-        recommendation: payload.recommend
+      if (!nick || !email || !pass) { alert('Заполните ник, email и пароль'); return; }
+      if (pass.length < 6) { alert('Пароль должен быть не короче 6 символов'); return; }
+      const { data, error } = await sb.auth.signUp({
+        email, password: pass,
+        options: { data: { nickname: nick }, emailRedirectTo: window.location.origin + window.location.pathname }
       });
+      if (error) { alert('Ошибка регистрации: ' + error.message); return; }
+      onClose();
+      if (data.user && !data.session) alert('Проверьте почту (' + email + ') и подтвердите email, затем войдите.');
+      else { alert('Аккаунт создан, вы вошли.'); onAuthed(); }
     }
   }
 
-  await sb.from('proposals').update({
-    status,
-    resolved_at: new Date().toISOString(),
-    resolved_by: currentUser ? currentUser.email : null
-  }).eq('id', id);
-
-  loadKeyboards();
-  loadSwitches();
-  loadProposals();
-}
-
-async function deleteProposal(id) {
-  if (!confirm('Удалить это предложение навсегда?')) return;
-  const { error } = await sb.from('proposals').delete().eq('id', id);
-  if (error) { alert('Ошибка удаления: ' + error.message); return; }
-  loadProposals();
-}
-
-// ============================================================
-//  ФОРМА ПРЕДЛОЖЕНИЯ (две отдельные формы: клавиатура / свитч)
-// ============================================================
-function showNewSubtab(cat) {
-  document.getElementById('proposal-form-keyboard').style.display = cat === 'keyboard' ? 'block' : 'none';
-  document.getElementById('proposal-form-switch').style.display = cat === 'switch' ? 'block' : 'none';
-  document.getElementById('new-subtab-btn-keyboard').classList.toggle('active', cat === 'keyboard');
-  document.getElementById('new-subtab-btn-switch').classList.toggle('active', cat === 'switch');
-}
-
-async function fillTargetSelect(selectId, table) {
-  const select = document.getElementById(selectId);
-  const { data, error } = await sb.from(table).select('id, name').order('name');
-  if (error) { select.innerHTML = `<option>Ошибка</option>`; return; }
-  select.innerHTML = (data || []).map(d => `<option value="${d.id}">${d.name}</option>`).join('');
-}
-
-// --- Клавиатура ---
-document.getElementById('kb-type').addEventListener('change', e => {
-  document.getElementById('kb-edit-target-wrap').style.display = e.target.value === 'edit' ? 'block' : 'none';
-  if (e.target.value === 'edit') fillTargetSelect('kb-target', 'devices');
-});
-
-document.getElementById('proposal-form-keyboard').addEventListener('submit', async e => {
-  e.preventDefault();
-  const type = document.getElementById('kb-type').value;
-  const target_id = type === 'edit' ? document.getElementById('kb-target').value : null;
-
-  const payload = {
-    name: document.getElementById('kb-name').value,
-    tier: document.getElementById('kb-tier').value,
-    format: document.getElementById('kb-format').value,
-    price: document.getElementById('kb-price').value,
-    buy_url: document.getElementById('kb-buy').value,
-    switches: document.getElementById('kb-switches').value,
-    software: document.getElementById('kb-software').value,
-    developer: document.getElementById('kb-dev').value,
-    recommend: document.getElementById('kb-recommend').value,
-    testers: document.getElementById('kb-testers').value,
-    pitfalls: document.getElementById('kb-pitfalls').value,
-  };
-  const reason = document.getElementById('kb-reason').value;
-  const author_name = document.getElementById('kb-author').value;
-
-  const { error } = await sb.from('proposals').insert({
-    type,
-    category: 'keyboard',
-    target_device_id: target_id,
-    target_table: 'devices',
-    payload,
-    reason,
-    author_name,
-    status: 'pending'
-  });
-
-  if (error) { alert('Ошибка: ' + error.message); return; }
-
-  alert('✅ Предложение отправлено!');
-  e.target.reset();
-  document.getElementById('kb-edit-target-wrap').style.display = 'none';
-  showTab('proposals');
-  loadProposals();
-});
-
-// --- Свитч ---
-document.getElementById('sw-type').addEventListener('change', e => {
-  document.getElementById('sw-edit-target-wrap').style.display = e.target.value === 'edit' ? 'block' : 'none';
-  if (e.target.value === 'edit') fillTargetSelect('sw-target', 'switches');
-});
-
-document.getElementById('proposal-form-switch').addEventListener('submit', async e => {
-  e.preventDefault();
-  const type = document.getElementById('sw-type').value;
-  const target_id = type === 'edit' ? document.getElementById('sw-target').value : null;
-
-  const payload = {
-    name: document.getElementById('sw-name').value,
-    tier: document.getElementById('sw-tier').value,
-    price: document.getElementById('sw-price').value,
-    buy_url: document.getElementById('sw-buy').value,
-    travel: document.getElementById('sw-travel').value,
-    force: document.getElementById('sw-force').value,
-    stem: document.getElementById('sw-stem').value,
-    top_housing: document.getElementById('sw-top').value,
-    bottom_housing: document.getElementById('sw-bottom').value,
-    recommend: document.getElementById('sw-recommend').value,
-    testers: document.getElementById('sw-testers').value,
-    notes: document.getElementById('sw-note').value,
-    pitfalls: document.getElementById('sw-pitfalls').value,
-  };
-  const reason = document.getElementById('sw-reason').value;
-  const author_name = document.getElementById('sw-author').value;
-
-  const { error } = await sb.from('proposals').insert({
-    type,
-    category: 'switch',
-    target_device_id: target_id,
-    target_table: 'switches',
-    payload,
-    reason,
-    author_name,
-    status: 'pending'
-  });
-
-  if (error) { alert('Ошибка: ' + error.message); return; }
-
-  alert('✅ Предложение отправлено!');
-  e.target.reset();
-  document.getElementById('sw-edit-target-wrap').style.display = 'none';
-  showTab('proposals');
-  loadProposals();
-});
-
-// ============================================================
-//  ИНИЦИАЛИЗАЦИЯ
-// ============================================================
-document.getElementById('view-grid').classList.toggle('active', currentView === 'grid');
-document.getElementById('view-list').classList.toggle('active', currentView === 'list');
-
-refreshAdminBar();
-loadStats();
-loadKeyboards();
-loadSwitches();
-loadProposals();
-
-const savedTab = localStorage.getItem('tierlist_tab') || 'home';
-showTab(savedTab);
-
-sb.auth.onAuthStateChange((event, session) => {
-  if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-    refreshAdminBar();
-    loadStats();
+  async function google() {
+    const { error } = await sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.origin + window.location.pathname } });
+    if (error) alert('Ошибка Google: ' + error.message);
   }
-});
+
+  return (
+    <Modal open={open} onClose={onClose} maxWidth="max-w-sm">
+      <h2 className="text-xl font-bold mb-1">{mode === 'login' ? 'Вход' : 'Регистрация'}</h2>
+      <p className="text-sm text-gray-400 mb-5">{mode === 'login' ? 'Рады видеть снова' : 'Пара полей — и вы внутри'}</p>
+
+      {mode === 'signup' && (
+        <label className="block text-sm text-gray-500 mt-1">Ник
+          <input value={nick} onChange={e => setNick(e.target.value)} className={inputCls} />
+        </label>
+      )}
+      <label className="block text-sm text-gray-500 mt-3">Email
+        <input type="email" value={email} onChange={e => setEmail(e.target.value)} className={inputCls} />
+      </label>
+      <label className="block text-sm text-gray-500 mt-3">Пароль
+        <input type="password" value={pass} onChange={e => setPass(e.target.value)} className={inputCls} />
+      </label>
+
+      <button onClick={submit} className="w-full mt-5 py-2.5 rounded-full bg-accent text-white font-semibold hover:bg-blue-700">
+        {mode === 'login' ? 'Войти' : 'Зарегистрироваться'}
+      </button>
+
+      <button onClick={() => setMode(mode === 'login' ? 'signup' : 'login')} className="w-full mt-2 text-sm text-accent">
+        {mode === 'login' ? 'Нет аккаунта? Зарегистрироваться' : 'Уже есть аккаунт? Войти'}
+      </button>
+
+      <div className="text-center text-xs text-gray-300 my-4">или</div>
+      <button onClick={google} className="w-full py-2.5 rounded-full bg-[#4285F4] text-white font-semibold hover:opacity-90">
+        Продолжить с Google
+      </button>
+    </Modal>
+  );
+}
+
+// ============================================================
+//  КОРНЕВОЙ КОМПОНЕНТ
+// ============================================================
+function App() {
+  const [tab, setTab] = useState(localStorage.getItem('tierlist_tab') || 'home');
+  const [search, setSearch] = useState('');
+  const [user, setUser] = useState(null);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [authOpen, setAuthOpen] = useState(false);
+
+  async function refreshAuth() {
+    const { data: { user } } = await sb.auth.getUser();
+    setUser(user || null);
+    if (user) {
+      const { data } = await sb.from('admins').select('*').eq('user_id', user.id).maybeSingle();
+      setIsAdmin(!!data);
+    } else setIsAdmin(false);
+  }
+  useEffect(() => {
+    refreshAuth();
+    const { data: sub } = sb.auth.onAuthStateChange(() => refreshAuth());
+    return () => sub.subscription.unsubscribe();
+  }, []);
+  useEffect(() => { localStorage.setItem('tierlist_tab', tab); }, [tab]);
+
+  async function logout() { await sb.auth.signOut(); refreshAuth(); }
+
+  return (
+    <div>
+      <Header tab={tab} setTab={setTab} search={search} setSearch={setSearch}
+        user={user} isAdmin={isAdmin} onLogout={logout} onOpenAuth={() => setAuthOpen(true)} />
+
+      {tab === 'home' && <HomePage setTab={setTab} />}
+      {tab === 'keyboards' && <CatalogPage category="keyboard" search={search} />}
+      {tab === 'switches' && <CatalogPage category="switch" search={search} />}
+      {tab === 'proposals' && <ProposalsPage isAdmin={isAdmin} currentUser={user} />}
+      {tab === 'new' && <NewProposalPage currentUser={user} onSubmitted={() => setTab('proposals')} />}
+
+      <AuthModal open={authOpen} onClose={() => setAuthOpen(false)} onAuthed={refreshAuth} />
+
+      <footer className="text-center text-xs text-gray-300 py-10">GD Tierlist · поддерживается сообществом</footer>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
 </script>
 </body>
 </html>
