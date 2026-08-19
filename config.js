@@ -1,4 +1,9 @@
-// Вставьте сюда данные вашего проекта Supabase
-// Project Settings -> API -> Project URL / anon public key
-const SUPABASE_URL = "https://bktbxspankyryhohgfyw.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_ACdohKG5AOv4e4n01Qq6vA_8u7nSGCQ";
+import { createClient } from '@supabase/supabase-js'
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL // или import.meta.env для Vite
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+// Можно добавить console.log(supabaseAnonKey) временно, 
+// чтобы убедиться, что ключ реально доходит до кода, а не выдает undefined.
+
+export const supabase = createClient(supabaseUrl, supabaseAnonKey)
